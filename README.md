@@ -8,6 +8,7 @@
 <a href="https://swiftpackageindex.com/space-code/typhoon"><img alt="Platform Compability" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fspace-code%2Ftyphoon%2Fbadge%3Ftype%3Dplatforms"/></a> 
 <a href="https://github.com/space-code/typhoon"><img alt="CI" src="https://github.com/space-code/Typhoon/actions/workflows/ci.yml/badge.svg?branch=main"></a>
 <a href="https://github.com/apple/swift-package-manager" alt="typhoon on Swift Package Manager" title="typhoon on Swift Package Manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg" /></a>
+<a href="https://codecov.io/gh/space-code/typhoon"><img src="https://codecov.io/gh/space-code/typhoon/graph/badge.svg?token=u89doKdnec"/></a>
 </p>
 
 ## Description

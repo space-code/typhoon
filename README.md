@@ -1,3 +1,5 @@
+![Typhoon: a service for retry policies](https://raw.githubusercontent.com/space-code/typhoon/dev/Resources/typhoon.png)
+
 <h1 align="center" style="margin-top: 0px;">typhoon</h1>
 
 <p align="center">
@@ -8,7 +10,7 @@
 </p>
 
 ## Description
-`Typhoon` description.
+`Typhoon` is a service for retry policies.
 
 - [Usage](#usage)
 - [Requirements](#requirements)
@@ -20,7 +22,37 @@
 
 ## Usage
 
+`Typhoon` provides two retry policy strategies:
+
+```swift
+/// A retry strategy with a constant number of attempts and fixed duration between retries.
+case constant(retry: Int, duration: DispatchTimeInterval)
+
+/// A retry strategy with an exponential increase in duration between retries.
+case exponential(retry: Int, multiplier: Double, duration: DispatchTimeInterval)
+```
+
+Create a `RetryPolicyService` instance and pass a desired strategy like this:
+
+```swift
+import Typhoon
+
+let retryPolicyService = RetryPolicyService(strategy: .constant(retry: 10, duration: .seconds(1)))
+
+do {
+    _ = try await retryPolicyService.retry { 
+        // Some logic here ...
+     }
+} catch {
+    // Catch an error here ...
+}
+```
+
 ## Requirements
+
+- iOS 15.0+ / macOS 12+ / tvOS 15.0+ / watchOS 8.0+ / visionOS 1.0+
+- Xcode 14.0
+- Swift 5.7
 
 ## Installation
 ### Swift Package Manager

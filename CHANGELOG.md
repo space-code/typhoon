@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ## Added
+- Increase the test coverage of the project
+  - Added in Pull Request [#6](https://github.com/space-code/typhoon/pull/6).
 - Implement error handling in RetryPolicyService
   - Added in Pull Request [#5](https://github.com/space-code/typhoon/pull/5).
 - Implement exponential backoff with jitter

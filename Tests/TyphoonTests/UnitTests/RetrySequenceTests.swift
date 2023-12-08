@@ -13,7 +13,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsConstant() {
         // given
-        let sequence = RetrySequence(strategy: .constant(retry: .retry, duration: .nanoseconds(1)))
+        let sequence = RetrySequence(strategy: .constant(retry: .retry, duration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -24,7 +24,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponential() {
         // given
-        let sequence = RetrySequence(strategy: .exponential(retry: .retry, duration: .nanoseconds(1)))
+        let sequence = RetrySequence(strategy: .exponential(retry: .retry, duration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -40,7 +40,7 @@ final class RetrySequenceTests: XCTestCase {
                 retry: .retry,
                 jitterFactor: .jitterFactor,
                 maxInterval: .maxInterval,
-                duration: .nanoseconds(1)
+                duration: .nanosecond
             )
         )
 
@@ -66,7 +66,7 @@ final class RetrySequenceTests: XCTestCase {
                 retry: .retry,
                 jitterFactor: .jitterFactor,
                 maxInterval: nil,
-                duration: .nanoseconds(1)
+                duration: .nanosecond
             )
         )
 
@@ -99,4 +99,8 @@ private extension UInt64 {
 private extension Double {
     static let multiplier = 2.0
     static let jitterFactor = 0.1
+}
+
+private extension DispatchTimeInterval {
+    static let nanosecond = DispatchTimeInterval.nanoseconds(1)
 }

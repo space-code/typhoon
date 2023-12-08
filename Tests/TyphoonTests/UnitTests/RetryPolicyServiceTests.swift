@@ -60,6 +60,22 @@ final class RetryPolicyServiceTests: XCTestCase {
         // then
         XCTAssertEqual(counter, .retry)
     }
+
+    func test_thatRetryServiceHandlesErrorOnFailureCallback_whenErrorOcurred() async {
+        // when
+        var failureError: NSError?
+        do {
+            _ = try await sut.retry(
+                strategy: .constant(retry: .retry, duration: .nanoseconds(1)),
+                onFailure: { error in failureError = error as NSError }
+            ) {
+                throw URLError(.unknown)
+            }
+        } catch {}
+
+        // then
+        XCTAssertEqual(failureError as? URLError, URLError(.unknown))
+    }
 }
 
 // MARK: - Constants

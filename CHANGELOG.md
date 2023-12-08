@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## Added
+- Implement exponential backoff with jitter
+  - Added in Pull Request [#4](https://github.com/space-code/typhoon/pull/4).
+
 #### 1.x Releases
 - `1.0.x` Releases - [1.0.0](#100)
 

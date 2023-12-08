@@ -30,7 +30,6 @@ opt_in_rules: # some rules are only opt-in
   - empty_count
   - empty_string
   - empty_xctest_method
-  - enum_case_associated_values_count
   - explicit_init
   - fallthrough
   - fatal_error_message

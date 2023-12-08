@@ -24,14 +24,17 @@
 
 ## Usage
 
-`Typhoon` provides two retry policy strategies:
+`Typhoon` provides three retry policy strategies:
 
 ```swift
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
 case constant(retry: Int, duration: DispatchTimeInterval)
 
 /// A retry strategy with an exponential increase in duration between retries.
-case exponential(retry: Int, multiplier: Double, duration: DispatchTimeInterval)
+case exponential(retry: Int, multiplier: Double = 2.0, duration: DispatchTimeInterval)
+
+/// A retry strategy with exponential increase in duration between retries and added jitter.
+case exponentialWithJitter(retry: Int, jitterFactor: Double = 0.1, maxInterval: UInt64? = 60, multiplier: Double = 2.0, duration: DispatchTimeInterval)
 ```
 
 Create a `RetryPolicyService` instance and pass a desired strategy like this:

@@ -47,6 +47,13 @@ struct RetryIterator: IteratorProtocol {
                 let value = duration * pow(multiplier, Double(retries))
                 return UInt64(value * .nanosec)
             }
+        case let .exponentialWithJitter(_, jitterFactor, maxInterval, multiplier, duration):
+            if let duration = duration.double {
+                let exponentialBackoff = duration * pow(multiplier, Double(retries))
+                let jitter = Double.random(in: -jitterFactor * exponentialBackoff ... jitterFactor * exponentialBackoff)
+                let value = max(0, exponentialBackoff + jitter)
+                return min(maxInterval ?? UInt64.max, UInt64(value * .nanosec))
+            }
         }
 
         return 0

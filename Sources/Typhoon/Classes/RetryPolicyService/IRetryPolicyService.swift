@@ -13,10 +13,15 @@ public protocol IRetryPolicyService {
     ///
     /// - Parameters:
     ///   - strategy: The strategy defining the behavior of the retry policy.
+    ///   - onFailure: An optional closure called on each failure to handle or log errors.
     ///   - closure: The closure that will be retried based on the specified strategy.
     ///
     /// - Returns: The result of the closure's execution after retrying based on the policy.
-    func retry<T>(strategy: RetryPolicyStrategy?, _ closure: () async throws -> T) async throws -> T
+    func retry<T>(
+        strategy: RetryPolicyStrategy?,
+        onFailure: ((Error) async -> Void)?,
+        _ closure: () async throws -> T
+    ) async throws -> T
 }
 
 public extension IRetryPolicyService {
@@ -27,6 +32,17 @@ public extension IRetryPolicyService {
     ///
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(_ closure: () async throws -> T) async throws -> T {
-        try await retry(strategy: nil, closure)
+        try await retry(strategy: nil, onFailure: nil, closure)
+    }
+
+    /// Retries a closure with a given strategy.
+    ///
+    /// - Parameters:
+    ///   - strategy: The strategy defining the behavior of the retry policy.
+    ///   - closure: The closure that will be retried based on the specified strategy.
+    ///
+    /// - Returns: The result of the closure's execution after retrying based on the policy.
+    func retry<T>(strategy: RetryPolicyStrategy?, _ closure: () async throws -> T) async throws -> T {
+        try await retry(strategy: strategy, onFailure: nil, closure)
     }
 }

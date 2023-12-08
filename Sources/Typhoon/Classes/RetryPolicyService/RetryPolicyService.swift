@@ -27,13 +27,19 @@ public final class RetryPolicyService {
 // MARK: IRetryPolicyService
 
 extension RetryPolicyService: IRetryPolicyService {
-    public func retry<T>(strategy: RetryPolicyStrategy?, _ closure: () async throws -> T) async throws -> T {
+    public func retry<T>(
+        strategy: RetryPolicyStrategy?,
+        onFailure: ((Error) async -> Void)?,
+        _ closure: () async throws -> T
+    ) async throws -> T {
         for duration in RetrySequence(strategy: strategy ?? self.strategy) {
             try Task.checkCancellation()
 
             do {
                 return try await closure()
-            } catch {}
+            } catch {
+                await onFailure?(error)
+            }
 
             try await Task.sleep(nanoseconds: duration)
         }

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+#### Updated
+- Update GitHub Actions
+  - Updated in Pull Request [#10](https://github.com/space-code/typhoon/pull/10)
+
 #### 1.x Releases
 - `1.1.x` Releases - [1.0.0](#110)
 - `1.0.x` Releases - [1.0.0](#100)

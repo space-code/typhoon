@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+#### Added
+- Add files to comply with community standards
+  - Added in Pull Request [#9](https://github.com/space-code/typhoon/pull/9).
+
 #### Updated
 - Update GitHub Actions
   - Updated in Pull Request [#10](https://github.com/space-code/typhoon/pull/10)

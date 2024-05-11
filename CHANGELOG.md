@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+#### 1.x Releases
+- `1.1.x` Releases - [1.1.0](#110) | [1.1.1](#111)
+- `1.0.x` Releases - [1.0.0](#100)
+
+## [1.1.1](https://github.com/space-code/typhoon/releases/tag/1.1.1)
 
 #### Added
 - Add the `upload_test_coverage_report` action

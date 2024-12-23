@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+#### Added
+- Increase the Swift version to 6.0.
+  - Added in Pull Request [#15](https://github.com/space-code/typhoon/pull/15)
+
 #### 1.x Releases
 - `1.1.x` Releases - [1.1.0](#110) | [1.1.1](#111)
 - `1.0.x` Releases - [1.0.0](#100)
@@ -11,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - Add the `upload_test_coverage_report` action
   - Added in Pull Request [#11](https://github.com/space-code/typhoon/pull/11)
 - Add files to comply with community standards
-  - Added in Pull Request [#9](https://github.com/space-code/typhoon/pull/9).
+  - Added in Pull Request [#9](https://github.com/space-code/typhoon/pull/9)
 
 #### Updated
 - Update GitHub Actions

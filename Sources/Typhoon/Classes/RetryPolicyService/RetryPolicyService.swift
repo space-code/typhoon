@@ -1,6 +1,6 @@
 //
 // Typhoon
-// Copyright © 2023 Space Code. All rights reserved.
+// Copyright © 2024 Space Code. All rights reserved.
 //
 
 import Foundation
@@ -29,8 +29,8 @@ public final class RetryPolicyService {
 extension RetryPolicyService: IRetryPolicyService {
     public func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: ((Error) async -> Void)?,
-        _ closure: () async throws -> T
+        onFailure: (@Sendable (Error) async -> Void)?,
+        _ closure: @Sendable () async throws -> T
     ) async throws -> T {
         for duration in RetrySequence(strategy: strategy ?? self.strategy) {
             try Task.checkCancellation()

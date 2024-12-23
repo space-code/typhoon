@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+#### Added
+- Mark the closures as @Sendable.
+  - Added in Pull Request [#18](https://github.com/space-code/typhoon/pull/18)
+
 #### 1.x Releases
 - `1.2.x` Releases - [1.2.0](#120)
 - `1.1.x` Releases - [1.1.0](#110) | [1.1.1](#111)

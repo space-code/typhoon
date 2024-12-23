@@ -1,12 +1,12 @@
 //
 // Typhoon
-// Copyright © 2023 Space Code. All rights reserved.
+// Copyright © 2024 Space Code. All rights reserved.
 //
 
 import Foundation
 
 /// A strategy used to define different retry policies.
-public enum RetryPolicyStrategy {
+public enum RetryPolicyStrategy: Sendable {
     /// A retry strategy with a constant number of attempts and fixed duration between retries.
     ///
     /// - Parameters:

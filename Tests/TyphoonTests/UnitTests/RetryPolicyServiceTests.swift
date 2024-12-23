@@ -1,6 +1,6 @@
 //
 // Typhoon
-// Copyright © 2023 Space Code. All rights reserved.
+// Copyright © 2024 Space Code. All rights reserved.
 //
 
 import Typhoon
@@ -42,15 +42,28 @@ final class RetryPolicyServiceTests: XCTestCase {
 
     func test_thatRetryServiceDoesNotThrowAnError_whenServiceDidReturnValue() async throws {
         // given
-        var counter = 0
+        actor Counter {
+            // MARK: Properties
+
+            private var value: Int = 0
+
+            // MARK: Internal
+
+            func increment() -> Int {
+                value += 1
+                return value
+            }
+        }
+
+        let counter = Counter()
 
         // when
         _ = try await sut.retry(
             strategy: .constant(retry: .retry, duration: .nanoseconds(1)),
             {
-                counter += 1
+                let currentCounter = await counter.increment()
 
-                if counter > .retry - 1 {
+                if currentCounter > .retry - 1 {
                     return 1
                 }
                 throw URLError(.unknown)
@@ -58,23 +71,43 @@ final class RetryPolicyServiceTests: XCTestCase {
         )
 
         // then
-        XCTAssertEqual(counter, .retry)
+        let finalValue = await counter.increment() - 1
+        XCTAssertEqual(finalValue, .retry)
     }
 
     func test_thatRetryServiceHandlesErrorOnFailureCallback_whenErrorOcurred() async {
+        // given
+        actor ErrorContainer {
+            // MARK: Private
+
+            private var error: NSError?
+
+            // MARK: Internal
+
+            func setError(_ newError: NSError) {
+                error = newError
+            }
+
+            func getError() -> NSError? {
+                error
+            }
+        }
+
+        let errorContainer = ErrorContainer()
+
         // when
-        var failureError: NSError?
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .retry, duration: .nanoseconds(1)),
-                onFailure: { error in failureError = error as NSError }
+                onFailure: { error in await errorContainer.setError(error as NSError) }
             ) {
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        XCTAssertEqual(failureError as? URLError, URLError(.unknown))
+        let capturedError = await errorContainer.getError()
+        XCTAssertEqual(capturedError as? URLError, URLError(.unknown))
     }
 }
 

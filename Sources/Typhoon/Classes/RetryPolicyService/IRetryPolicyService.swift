@@ -1,6 +1,6 @@
 //
 // Typhoon
-// Copyright © 2023 Space Code. All rights reserved.
+// Copyright © 2024 Space Code. All rights reserved.
 //
 
 import Foundation
@@ -8,7 +8,7 @@ import Foundation
 // MARK: - IRetryPolicyService
 
 /// A type that defines a service for retry policies
-public protocol IRetryPolicyService {
+public protocol IRetryPolicyService: Sendable {
     /// Retries a closure with a given strategy.
     ///
     /// - Parameters:
@@ -19,8 +19,8 @@ public protocol IRetryPolicyService {
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: ((Error) async -> Void)?,
-        _ closure: () async throws -> T
+        onFailure: (@Sendable (Error) async -> Void)?,
+        _ closure: @Sendable () async throws -> T
     ) async throws -> T
 }
 
@@ -31,7 +31,7 @@ public extension IRetryPolicyService {
     ///   - closure: The closure that will be retried based on the specified strategy.
     ///
     /// - Returns: The result of the closure's execution after retrying based on the policy.
-    func retry<T>(_ closure: () async throws -> T) async throws -> T {
+    func retry<T>(_ closure: @Sendable () async throws -> T) async throws -> T {
         try await retry(strategy: nil, onFailure: nil, closure)
     }
 
@@ -42,7 +42,7 @@ public extension IRetryPolicyService {
     ///   - closure: The closure that will be retried based on the specified strategy.
     ///
     /// - Returns: The result of the closure's execution after retrying based on the policy.
-    func retry<T>(strategy: RetryPolicyStrategy?, _ closure: () async throws -> T) async throws -> T {
+    func retry<T>(strategy: RetryPolicyStrategy?, _ closure: @Sendable () async throws -> T) async throws -> T {
         try await retry(strategy: strategy, onFailure: nil, closure)
     }
 }

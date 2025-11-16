@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 #### Added
 - Add support for Swift 6.2
   - Added in Pull Request [#21](https://github.com/space-code/typhoon/pull/21)
+- Add `dependabot.yml`
+  - Added in Pull Request [#22](https://github.com/space-code/typhoon/pull/22)
 
 ## [1.2.1](https://github.com/space-code/typhoon/releases/tag/1.2.1)
 

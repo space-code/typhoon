@@ -56,8 +56,8 @@ do {
 ## Requirements
 
 - iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+ / visionOS 1.0+
-- Xcode 14.0
-- Swift 5.7
+- Xcode 15.3
+- Swift 5.10
 
 ## Installation
 ### Swift Package Manager
@@ -68,7 +68,7 @@ Once you have your Swift package set up, adding `typhoon` as a dependency is as 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/space-code/typhoon.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/space-code/typhoon.git", .upToNextMajor(from: "1.3.0"))
 ]
 ```
 

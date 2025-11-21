@@ -17,7 +17,7 @@ jobs:
   SwiftLint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: GitHub Action for SwiftLint
         uses: norio-nomura/action-swiftlint@3.2.1
         with:
@@ -44,7 +44,7 @@ jobs:
             runsOn: macOS-14
             name: "macOS 14, Xcode 15.4, Swift 5.10"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ${{ matrix.name }}
         run: xcodebuild test -scheme "Typhoon" -destination "platform=macOS" clean -enableCodeCoverage YES -resultBundlePath "test_output/${{ matrix.name }}.xcresult" || exit 1
       - name: Upload test coverage reports to Codecov
@@ -77,7 +77,7 @@ jobs:
             xcode: "Xcode_15.3"
             runsOn: macos-14
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ${{ matrix.name }}
         run: xcodebuild test -scheme "Typhoon" -destination "${{ matrix.destination }}" clean -enableCodeCoverage YES -resultBundlePath "test_output/${{ matrix.name }}.xcresult" || exit 1
       - name: Upload test coverage reports to Codecov
@@ -110,7 +110,7 @@ jobs:
             xcode: "Xcode_15.3"
             runsOn: macos-14
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ${{ matrix.name }}
         run: xcodebuild test -scheme "Typhoon" -destination "${{ matrix.destination }}" clean -enableCodeCoverage YES -resultBundlePath "test_output/${{ matrix.name }}.xcresult" || exit 1
       - name: Upload test coverage reports to Codecov
@@ -147,7 +147,7 @@ jobs:
             xcode: "Xcode_15.3"
             runsOn: macos-14
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ${{ matrix.name }}
         run: xcodebuild test -scheme "Typhoon" -destination "${{ matrix.destination }}" clean -enableCodeCoverage YES -resultBundlePath "test_output/${{ matrix.name }}.xcresult" || exit 1
       - name: Upload test coverage reports to Codecov
@@ -180,7 +180,7 @@ jobs:
             xcode: "Xcode_15.3"
             runsOn: macos-14
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ${{ matrix.name }}
         run: swift build -c release
 
@@ -205,7 +205,7 @@ jobs:
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python environment
         run: |

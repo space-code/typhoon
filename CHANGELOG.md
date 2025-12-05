@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Contributed by [@renovate[bot]](https://github.com/renovate[bot]) in Pull Request [#29](https://github.com/space-code/typhoon/pull/29).
 
 ### New Contributors
-* @renovate[bot] made their first contribution in [#32](https://github.com/space-code/typhoon/pull/32)
+* @renovate[bot] made their first contribution in [#35](https://github.com/space-code/typhoon/pull/35)
 
 ## [1.3.0](https://github.com/space-code/typhoon/releases/tag/1.3.0)
 

@@ -1,6 +1,6 @@
 //
 // Typhoon
-// Copyright © 2024 Space Code. All rights reserved.
+// Copyright © 2023 Space Code. All rights reserved.
 //
 
 import Foundation
@@ -42,11 +42,11 @@ public enum RetryPolicyStrategy: Sendable {
     public var retries: Int {
         switch self {
         case let .constant(retry, _):
-            return retry
+            retry
         case let .exponential(retry, _, _):
-            return retry
+            retry
         case let .exponentialWithJitter(retry, _, _, _, _):
-            return retry
+            retry
         }
     }
 
@@ -54,11 +54,11 @@ public enum RetryPolicyStrategy: Sendable {
     public var duration: DispatchTimeInterval {
         switch self {
         case let .constant(_, duration):
-            return duration
+            duration
         case let .exponential(_, _, duration):
-            return duration
+            duration
         case let .exponentialWithJitter(_, _, _, _, duration):
-            return duration
+            duration
         }
     }
 }

@@ -12,7 +12,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `1.0.x` Releases - [1.0.0](#100)
 
 ---
+## [Unreleased]
 
+### Features
+- Switch from Makefile to Mise
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#27](https://github.com/space-code/typhoon/pull/27).
+
+### Miscellaneous Tasks
+- Update the danger action
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#36](https://github.com/space-code/typhoon/pull/36).
+- Add conventional-pr.yml for PR validation
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#28](https://github.com/space-code/typhoon/pull/28).
+- Update config
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#34](https://github.com/space-code/typhoon/pull/34).
+
+### Uncategorized Changes
+- Add renovate.json
+  - Contributed by [@renovate[bot]](https://github.com/renovate[bot]) in Pull Request [#29](https://github.com/space-code/typhoon/pull/29).
+
+### New Contributors
+* @renovate[bot] made their first contribution in [#32](https://github.com/space-code/typhoon/pull/32)
 
 ## [1.3.0](https://github.com/space-code/typhoon/releases/tag/1.3.0)
 
@@ -103,6 +122,7 @@ Released on 2023-11-12. All issues associated with this milestone can be found u
 - Release `1.0.0`
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#1](https://github.com/space-code/typhoon/pull/1).
 
+[unreleased]: https://github.com/space-code/typhoon/compare/1.3.0..HEAD
 [1.3.0]: https://github.com/space-code/typhoon/compare/1.2.1..1.3.0
 [1.2.1]: https://github.com/space-code/typhoon/compare/1.2.0..1.2.1
 [1.2.0]: https://github.com/space-code/typhoon/compare/1.1.1..1.2.0

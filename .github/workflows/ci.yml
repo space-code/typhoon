@@ -27,7 +27,7 @@ jobs:
   SwiftLint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: GitHub Action for SwiftLint
         uses: norio-nomura/action-swiftlint@3.2.1
         with:
@@ -67,7 +67,7 @@ jobs:
           - { platform: watchOS, name: "watchOS 10.4", xcode: "Xcode_15.3", runsOn: macOS-14, destination: "OS=10.4,name=Apple Watch Series 9 (45mm)" }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Run tests - ${{ matrix.name }}
         run: |
           xcodebuild test \
@@ -99,7 +99,7 @@ jobs:
           - { name: "macOS 14, SPM 5.10.0", xcode: "Xcode_15.3", runsOn: macOS-14 }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Build with Swift Package Manager - ${{ matrix.name }}
         run: swift build -c release
 
@@ -127,7 +127,7 @@ jobs:
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python environment
         run: |

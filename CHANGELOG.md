@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#27](https://github.com/space-code/typhoon/pull/27).
 
 ### Miscellaneous Tasks
+- Add `.spi.yml`
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#39](https://github.com/space-code/typhoon/pull/39).
 - Add GitHub issue and PR templates
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#37](https://github.com/space-code/typhoon/pull/37).
 - Update the danger action

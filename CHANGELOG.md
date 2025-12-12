@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#27](https://github.com/space-code/typhoon/pull/27).
 
 ### Miscellaneous Tasks
+- Add codeowners
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#41](https://github.com/space-code/typhoon/pull/41).
 - Add `.spi.yml`
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#39](https://github.com/space-code/typhoon/pull/39).
 - Add GitHub issue and PR templates
@@ -37,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Contributed by [@renovate[bot]](https://github.com/renovate[bot]) in Pull Request [#29](https://github.com/space-code/typhoon/pull/29).
 
 ### New Contributors
-* @renovate[bot] made their first contribution in [#40](https://github.com/space-code/typhoon/pull/40)
+* @renovate[bot] made their first contribution in 
 
 ## [1.3.0](https://github.com/space-code/typhoon/releases/tag/1.3.0)
 

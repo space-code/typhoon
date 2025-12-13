@@ -27,9 +27,17 @@ public final class RetryPolicyService {
 // MARK: IRetryPolicyService
 
 extension RetryPolicyService: IRetryPolicyService {
+    /// Retries a closure with a given strategy.
+    ///
+    /// - Parameters:
+    ///   - strategy: The strategy defining the behavior of the retry policy.
+    ///   - onFailure: An optional closure called on each failure to handle or log errors.
+    ///   - closure: The closure that will be retried based on the specified strategy.
+    ///
+    /// - Returns: The result of the closure's execution after retrying based on the policy.
     public func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: (@Sendable (Error) async -> Void)?,
+        onFailure: (@Sendable (Error) async -> Bool)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> T {
         for duration in RetrySequence(strategy: strategy ?? self.strategy) {
@@ -38,7 +46,11 @@ extension RetryPolicyService: IRetryPolicyService {
             do {
                 return try await closure()
             } catch {
-                await onFailure?(error)
+                let shouldContinue = await onFailure?(error) ?? true
+
+                if !shouldContinue {
+                    throw error
+                }
             }
 
             try await Task.sleep(nanoseconds: duration)

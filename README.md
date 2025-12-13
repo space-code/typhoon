@@ -17,11 +17,11 @@ Typhoon is a modern, lightweight Swift framework that provides elegant and robus
 ## Features
 
 ✨ **Multiple Retry Strategies** - Constant, exponential, and exponential with jitter  
-⚡ **Async/Await Native** - Built for modern Swift concurrency
+⚡ **Async/Await Native** - Built for modern Swift concurrency  
 🎯 **Type-Safe** - Leverages Swift's type system for compile-time safety  
-🔧 **Configurable** - Flexible retry parameters for any use case
+🔧 **Configurable** - Flexible retry parameters for any use case  
 📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS, and visionOS  
-⚡ **Lightweight** - Minimal footprint with zero dependencies
+⚡ **Lightweight** - Minimal footprint with zero dependencies  
 🧪 **Well Tested** - Comprehensive test coverage
 
 ## Table of Contents

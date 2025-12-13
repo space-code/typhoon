@@ -92,6 +92,49 @@ jobs:
       - name: Build with Swift Package Manager - ${{ matrix.name }}
         run: swift build -c release
 
+  test-linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: swift:6.0-focal
+          - image: swift:6.0-jammy
+          - image: swift:6.0-rhel-ubi9
+          - image: swift:6.1-focal
+          - image: swift:6.1-jammy
+          - image: swift:6.1-rhel-ubi9
+          - image: swift:6.2-bookworm
+          - image: swift:6.2-jammy
+          - image: swift:6.2-noble
+          - image: swift:6.2-rhel-ubi9
+          - image: swiftlang/swift:nightly-focal
+          - image: swiftlang/swift:nightly-jammy
+    container:
+      image: ${{ matrix.image }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: ${{ matrix.image }}
+        run: swift build --build-tests -c debug
+
+  test-android:
+    name: Android
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Build for Android
+        uses: skiptools/swift-android-action@v2
+        with:
+          build-tests: true
+          run-tests: false
+
   merge-test-reports:
     needs: test-apple-platforms
     runs-on: macos-15

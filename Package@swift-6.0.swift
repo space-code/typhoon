@@ -15,7 +15,6 @@ let package = Package(
     products: [
         .library(name: "Typhoon", targets: ["Typhoon"]),
     ],
-    dependencies: [],
     targets: [
         .target(name: "Typhoon", dependencies: []),
         .testTarget(name: "TyphoonTests", dependencies: ["Typhoon"]),

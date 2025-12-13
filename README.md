@@ -108,7 +108,7 @@ case exponential(retry: Int, multiplier: Double = 2.0, duration: DispatchTimeInt
 case exponentialWithJitter(
     retry: Int, 
     jitterFactor: Double = 0.1, 
-    maxInterval: UInt64? = 60, 
+    maxInterval: DispatchTimeInterval? = .seconds(60), 
     multiplier: Double = 2.0, 
     duration: DispatchTimeInterval
 )
@@ -185,7 +185,7 @@ let service = RetryPolicyService(
     strategy: .exponentialWithJitter(
         retry: 5,
         jitterFactor: 0.2,      // Add ±20% randomization
-        maxInterval: 30,         // Cap at 30 seconds
+        maxInterval: .seconds(30),         // Cap at 30 seconds
         multiplier: 2.0,
         duration: .seconds(1)
     )
@@ -238,7 +238,7 @@ class DatabaseManager {
         strategy: .exponentialWithJitter(
             retry: 5,
             jitterFactor: 0.15,
-            maxInterval: 60,
+            maxInterval: .seconds(60),
             duration: .seconds(1)
         )
     )

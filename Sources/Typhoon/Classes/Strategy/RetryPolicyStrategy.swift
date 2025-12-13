@@ -33,7 +33,7 @@ public enum RetryPolicyStrategy: Sendable {
     case exponentialWithJitter(
         retry: Int,
         jitterFactor: Double = 0.1,
-        maxInterval: UInt64? = 60,
+        maxInterval: DispatchTimeInterval? = .seconds(60),
         multiplier: Double = 2,
         duration: DispatchTimeInterval
     )

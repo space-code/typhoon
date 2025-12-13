@@ -35,12 +35,17 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponentialWithJitter() {
         // given
+        let durationSeconds = 1.0
+        let multiplier = 2.0
+        let jitterFactor = 0.1
+
         let sequence = RetrySequence(
             strategy: .exponentialWithJitter(
-                retry: .retry,
-                jitterFactor: .jitterFactor,
-                maxInterval: .maxInterval,
-                duration: .nanosecond
+                retry: 5,
+                jitterFactor: jitterFactor,
+                maxInterval: nil,
+                multiplier: multiplier,
+                duration: .seconds(Int(durationSeconds))
             )
         )
 
@@ -48,15 +53,119 @@ final class RetrySequenceTests: XCTestCase {
         let result: [UInt64] = sequence.map { $0 }
 
         // then
-        XCTAssertEqual(result.count, 8)
-        XCTAssertEqual(result[0], 1, accuracy: 1)
-        XCTAssertEqual(result[1], 2, accuracy: 1)
-        XCTAssertEqual(result[2], 4, accuracy: 1)
-        XCTAssertEqual(result[3], 8, accuracy: 1)
-        XCTAssertEqual(result[4], 16, accuracy: 2)
-        XCTAssertEqual(result[5], 32, accuracy: 4)
-        XCTAssertEqual(result[6], 64, accuracy: 7)
-        XCTAssertEqual(result[7], .maxInterval)
+        XCTAssertEqual(result.count, 5)
+
+        for (i, valueNanos) in result.enumerated() {
+            let seconds = toSeconds(valueNanos)
+
+            let expectedBase = durationSeconds * pow(multiplier, Double(i))
+
+            let lowerBound = expectedBase * (1.0 - jitterFactor)
+            let upperBound = expectedBase * (1.0 + jitterFactor)
+
+            XCTAssertTrue(
+                seconds >= lowerBound && seconds <= upperBound,
+                "Attempt \(i): \(seconds)s should be between \(lowerBound)s and \(upperBound)s"
+            )
+        }
+    }
+
+    func test_thatRetrySequenceRespectsMaxInterval_whenStrategyIsExponentialWithJitter() {
+        // given
+        let maxIntervalDuration: DispatchTimeInterval = .seconds(10)
+        let maxIntervalNanos: UInt64 = 10 * 1_000_000_000
+
+        let sequence = RetrySequence(
+            strategy: .exponentialWithJitter(
+                retry: 10,
+                jitterFactor: 0.1,
+                maxInterval: maxIntervalDuration,
+                multiplier: 2.0,
+                duration: .seconds(1)
+            )
+        )
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result.count, 10)
+
+        for (i, val) in result.enumerated() {
+            XCTAssertLessThanOrEqual(val, maxIntervalNanos, "Attempt \(i) exceeded maxInterval")
+
+            let expectedBaseSeconds = 1.0 * pow(2.0, Double(i))
+
+            if expectedBaseSeconds * (1.0 - 0.1) > 10.0 {
+                XCTAssertEqual(val, maxIntervalNanos, "Attempt \(i) should be capped at maxInterval")
+            }
+        }
+    }
+
+    func test_thatRetrySequenceAppliesJitter_whenStrategyIsExponentialWithJitter() {
+        // given
+        let strategy = RetryPolicyStrategy.exponentialWithJitter(
+            retry: 30,
+            jitterFactor: 0.5,
+            maxInterval: nil,
+            multiplier: 2.0,
+            duration: .milliseconds(10)
+        )
+
+        let sequence1 = RetrySequence(strategy: strategy)
+        let sequence2 = RetrySequence(strategy: strategy)
+
+        // when
+        let result1 = sequence1.map { $0 }
+        let result2 = sequence2.map { $0 }
+
+        // then
+        XCTAssertEqual(result1.count, 30)
+
+        XCTAssertNotEqual(result1, result2, "Two sequences with jitter should produce different values")
+
+        for (i, val) in result1.enumerated() {
+            let seconds = toSeconds(val)
+
+            let base = 0.01 * pow(2.0, Double(i))
+
+            let lower = base * 0.5
+            let upper = base * 1.5
+
+            XCTAssertTrue(
+                seconds >= lower && seconds <= upper,
+                "Attempt \(i): Value \(seconds) is out of bounds [\(lower), \(upper)]"
+            )
+        }
+    }
+
+    func test_thatRetrySequenceWorksWithoutMaxInterval_whenStrategyIsExponentialWithJitter() {
+        // given
+        let sequence = RetrySequence(
+            strategy: .exponentialWithJitter(
+                retry: 5,
+                jitterFactor: 0.1,
+                maxInterval: nil,
+                multiplier: 2.0,
+                duration: .seconds(1)
+            )
+        )
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result.count, 5)
+
+        for i in 1 ..< result.count {
+            XCTAssertGreaterThan(
+                result[i],
+                result[i - 1],
+                "Each delay should be greater than previous (exponential growth)"
+            )
+        }
+
+        XCTAssertGreaterThan(result[4], result[0] * 10)
     }
 
     func test_thatRetrySequenceDoesNotLimitASequence_whenStrategyIsExponentialWithJitterAndMaxIntervalIsNil() {
@@ -83,6 +192,12 @@ final class RetrySequenceTests: XCTestCase {
         XCTAssertEqual(result[5], 32, accuracy: 4)
         XCTAssertEqual(result[6], 64, accuracy: 8)
         XCTAssertEqual(result[7], 128, accuracy: 13)
+    }
+
+    // MARK: Helpers
+
+    private func toSeconds(_ nanos: UInt64) -> Double {
+        Double(nanos) / 1_000_000_000
     }
 }
 

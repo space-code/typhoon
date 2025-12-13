@@ -46,6 +46,13 @@ public extension IRetryPolicyService {
         try await retry(strategy: strategy, onFailure: nil, closure)
     }
 
+    /// Retries a closure with a given strategy.
+    ///
+    /// - Parameters:
+    ///   - onFailure: An optional closure called on each failure to handle or log errors.
+    ///   - closure: The closure that will be retried based on the specified strategy.
+    ///
+    /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(_ closure: @Sendable () async throws -> T, onFailure: (@Sendable (Error) async -> Bool)?) async throws -> T {
         try await retry(strategy: nil, onFailure: onFailure, closure)
     }

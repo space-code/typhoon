@@ -16,11 +16,11 @@ Typhoon is a modern, lightweight Swift framework that provides elegant and robus
 
 ## Features
 
-✨ **Multiple Retry Strategies** - Constant, exponential, and exponential with jitter
+✨ **Multiple Retry Strategies** - Constant, exponential, and exponential with jitter  
 ⚡ **Async/Await Native** - Built for modern Swift concurrency
-🎯 **Type-Safe** - Leverages Swift's type system for compile-time safety
+🎯 **Type-Safe** - Leverages Swift's type system for compile-time safety  
 🔧 **Configurable** - Flexible retry parameters for any use case
-📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS, and visionOS
+📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS, and visionOS  
 ⚡ **Lightweight** - Minimal footprint with zero dependencies
 🧪 **Well Tested** - Comprehensive test coverage
 
@@ -35,8 +35,8 @@ Typhoon is a modern, lightweight Swift framework that provides elegant and robus
   - [Exponential Strategy](#exponential-strategy)
   - [Exponential with Jitter Strategy](#exponential-with-jitter-strategy)
 - [Common Use Cases](#common-use-cases)
-- [Error Handling](#error-handling)
 - [Communication](#communication)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
   - [Development Setup](#development-setup)
 - [Author](#author)
@@ -291,36 +291,16 @@ class PaymentService {
 }
 ```
 
-## Error Handling
-
-Typhoon preserves the original error from your operation after all retry attempts are exhausted:
-
-```swift
-import Typhoon
-
-let service = RetryPolicyService(
-    strategy: .constant(retry: 3, duration: .seconds(1))
-)
-
-do {
-    try await service.retry {
-        throw NetworkError.serverUnavailable
-    }
-} catch let error as NetworkError {
-    // Handle specific error type
-    print("Network error: \(error)")
-} catch {
-    // Handle other errors
-    print("Unexpected error: \(error)")
-}
-```
-
 ## Communication
 
 - 🐛 **Found a bug?** [Open an issue](https://github.com/space-code/typhoon/issues/new)
 - 💡 **Have a feature request?** [Open an issue](https://github.com/space-code/typhoon/issues/new)
 - ❓ **Questions?** [Start a discussion](https://github.com/space-code/typhoon/discussions)
 - 🔒 **Security issue?** Email nv3212@gmail.com
+
+## Documentation
+
+Comprehensive documentation is available: [Typhoon Documentation](https://space-code.github.io/typhoon/typhoon/documentation/typhoon/)
 
 ## Contributing
 

@@ -357,7 +357,7 @@ func fetch() async throws -> Data {
 
 ## See Also
 
-- <doc:QuickStart>
-- <doc:AdvancedStrategies>
+- <doc:quick-start>
+- <doc:advanced-retry-strategies>
+
 - ``RetryPolicyService``
-- ``RetryStrategy``

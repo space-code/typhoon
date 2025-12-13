@@ -181,11 +181,10 @@ let criticalRetry = RetryPolicyService(
 
 Now that you have the basics, explore:
 
-- <doc:AdvancedStrategies> - Deep dive into retry strategies
-- <doc:BestPractices> - Learn best practices and patterns
+- <doc:advanced-retry-strategies> - Deep dive into retry strategies
+- <doc:best-practices> - Learn best practices and patterns
 
 ## See Also
 
 - ``RetryPolicyService``
-- ``RetryStrategy``
-- ``RetrySequence``
+- ``RetryPolicyStrategy``

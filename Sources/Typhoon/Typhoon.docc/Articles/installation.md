@@ -1,4 +1,4 @@
-#  Installation
+# Installation
 
 A guide to installing the Typhoon package into your Swift project using Swift Package Manager.
 

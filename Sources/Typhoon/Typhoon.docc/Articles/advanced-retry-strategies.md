@@ -375,7 +375,7 @@ XCTAssertEqual(result, "Success")
 
 ## See Also
 
-- <doc:QuickStart>
-- <doc:BestPractices>
+- <doc:quick-start>
+- <doc:best-practices>
+
 - ``RetryPolicyService``
-- ``RetryStrategy``

@@ -19,7 +19,7 @@ public protocol IRetryPolicyService: Sendable {
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: (@Sendable (Error) async -> Void)?,
+        onFailure: (@Sendable (Error) async -> Bool)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> T
 }
@@ -44,5 +44,9 @@ public extension IRetryPolicyService {
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(strategy: RetryPolicyStrategy?, _ closure: @Sendable () async throws -> T) async throws -> T {
         try await retry(strategy: strategy, onFailure: nil, closure)
+    }
+
+    func retry<T>(_ closure: @Sendable () async throws -> T, onFailure: (@Sendable (Error) async -> Bool)?) async throws -> T {
+        try await retry(strategy: nil, onFailure: onFailure, closure)
     }
 }

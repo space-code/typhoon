@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [Unreleased]
 
+### Bug Fixes
+- Safely handle UInt64 overflow and standardize max interval unit
+  - Fixed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#43](https://github.com/space-code/typhoon/pull/43).
+
 ### Features
 - Add release workflow for GitHub Actions
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#38](https://github.com/space-code/typhoon/pull/38).

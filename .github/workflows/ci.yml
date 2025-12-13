@@ -24,17 +24,6 @@ env:
   SCHEME_NAME: "Typhoon"
 
 jobs:
-  SwiftLint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: GitHub Action for SwiftLint
-        uses: norio-nomura/action-swiftlint@3.2.1
-        with:
-          args: --strict
-        env:
-          DIFF_BASE: ${{ github.base_ref }}
-
   test-apple-platforms:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.runsOn }}

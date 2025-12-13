@@ -99,7 +99,10 @@ final class RetryPolicyServiceTests: XCTestCase {
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .retry, duration: .nanoseconds(1)),
-                onFailure: { error in await errorContainer.setError(error as NSError) }
+                onFailure: { error in
+                    await errorContainer.setError(error as NSError)
+                    return false
+                }
             ) {
                 throw URLError(.unknown)
             }

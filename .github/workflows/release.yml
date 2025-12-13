@@ -100,3 +100,41 @@ jobs:
           tag_name: ${{ steps.next-version.outputs.NEXT_VERSION }}
           body: ${{ steps.release-notes.outputs.RELEASE_NOTES }}
           target_commitish: ${{ steps.auto-commit-action.outputs.commit_hash }}
+
+  docc:
+    name: build and deploy docc
+    runs-on: macos-latest
+    needs: release
+    if: ${{ needs.release.outputs.has-changes == 'true' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release.outputs.commit-hash }}
+          fetch-depth: 0
+      - name: Build DocC
+        id: build
+        uses: space-code/build-docc@main
+        with:
+          schemes: '["Typhoon"]'
+          version: ${{ needs.release.outputs.next-version }}
+      - name: Generate Index Page
+        uses: space-code/generate-index@v1.0.0
+        with:
+          version: ${{ needs.release.outputs.next-version }}
+          project-name: 'Typhoon'
+          project-description: 'Typhoon is a modern, lightweight Swift framework that provides elegant and robust retry policies for asynchronous operations.'
+          modules: |
+            [
+              {
+                "name": "Typhoon",
+                "path": "typhoon",
+                "description": "Core retry mechanisms and policies for asynchronous operations. Includes retry strategies, backoff algorithms, and cancellation support.",
+                "badge": "Core Module"
+              }
+            ]
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs

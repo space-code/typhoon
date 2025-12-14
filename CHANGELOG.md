@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update config
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#34](https://github.com/space-code/typhoon/pull/34).
 
+### Refactor
+- Unify retry execution flow
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#49](https://github.com/space-code/typhoon/pull/49).
+
 ### Uncategorized Changes
 - Add renovate.json
   - Contributed by [@renovate[bot]](https://github.com/renovate[bot]) in Pull Request [#29](https://github.com/space-code/typhoon/pull/29).

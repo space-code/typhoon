@@ -311,7 +311,7 @@ We love contributions! Please feel free to help out with this project. If you se
 Bootstrap the development environment:
 
 ```bash
-make bootstrap
+mise install
 ```
 
 ## Author

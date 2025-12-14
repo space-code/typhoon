@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#27](https://github.com/space-code/typhoon/pull/27).
 
 ### Miscellaneous Tasks
+- Automate code formatting and linting with github actions
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#47](https://github.com/space-code/typhoon/pull/47).
 - Add SPM build checks for Android and Linux
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#46](https://github.com/space-code/typhoon/pull/46).
 - Remove the Swiftlint step

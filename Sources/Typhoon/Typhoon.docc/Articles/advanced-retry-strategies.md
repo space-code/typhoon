@@ -7,6 +7,34 @@ Master advanced retry patterns and optimization techniques.
 
 This guide covers advanced usage patterns, performance optimization, and sophisticated retry strategies for complex scenarios.
 
+## How Retry Mechanism Works
+
+Understanding the retry flow is crucial for effective error handling:
+
+```swift
+// Configuration: retry: 3 means 3 RETRY attempts
+let strategy = RetryStrategy.exponential(
+    retry: 3,
+    multiplier: 2.0,
+    duration: .seconds(1)
+)
+```
+
+**Total Execution Flow:**
+
+| Attempt Type | Attempt # | Delay Before | Description |
+|--------------|-----------|--------------|-------------|
+| Initial | 1 | 0s | First execution (not a retry) |
+| Retry | 2 | 1s | First retry after failure |
+| Retry | 3 | 2s | Second retry after failure |
+| Retry | 4 | 4s | Third retry after failure |
+
+**Key Points:**
+- The `retry` parameter specifies the number of **retry attempts**, not total attempts
+- Total attempts = 1 (initial) + N (retries)
+- `retry: 3` means **4 total attempts** (1 initial + 3 retries)
+- `onFailure` callback is invoked after **every** failed attempt, including the initial one
+
 ## Strategy Deep Dive
 
 ### Understanding Exponential Backoff
@@ -15,33 +43,36 @@ Exponential backoff progressively increases wait times to avoid overwhelming rec
 
 ```swift
 let strategy = RetryStrategy.exponential(
-    retry: 5,
+    retry: 5,                    // 5 retry attempts
     multiplier: 2.0,
     duration: .seconds(1)
 )
 ```
 
-**Calculation:** `delay = baseDuration × multiplier^retryCount`
+**Calculation:** `delay = baseDuration × multiplier^(attemptNumber - 1)`
 
-| Attempt | Calculation | Delay |
-|---------|-------------|-------|
-| 1 | 1 × 2⁰ | 1s |
-| 2 | 1 × 2¹ | 2s |
-| 3 | 1 × 2² | 4s |
-| 4 | 1 × 2³ | 8s |
-| 5 | 1 × 2⁴ | 16s |
+| Attempt Type | Total Attempt | Calculation | Delay Before |
+|--------------|---------------|-------------|--------------|
+| Initial | 1 | - | 0s (immediate) |
+| Retry 1 | 2 | 1 × 2⁰ | 1s |
+| Retry 2 | 3 | 1 × 2¹ | 2s |
+| Retry 3 | 4 | 1 × 2² | 4s |
+| Retry 4 | 5 | 1 × 2³ | 8s |
+| Retry 5 | 6 | 1 × 2⁴ | 16s |
+
+**Total: 6 attempts (1 initial + 5 retries)**
 
 **Multiplier effects:**
 
 ```swift
 // Aggressive backoff (multiplier: 3.0)
-// 1s → 3s → 9s → 27s → 81s
+// Initial: 0s → Retry: 1s → 3s → 9s → 27s → 81s
 
 // Moderate backoff (multiplier: 1.5)
-// 1s → 1.5s → 2.25s → 3.375s → 5.0625s
+// Initial: 0s → Retry: 1s → 1.5s → 2.25s → 3.375s → 5.0625s
 
 // Slow backoff (multiplier: 1.2)
-// 1s → 1.2s → 1.44s → 1.728s → 2.074s
+// Initial: 0s → Retry: 1s → 1.2s → 1.44s → 1.728s → 2.074s
 ```
 
 ### Jitter: Preventing Thundering Herd
@@ -50,7 +81,7 @@ When multiple clients retry simultaneously, they can overwhelm a recovering serv
 
 ```swift
 let strategy = RetryStrategy.exponentialWithJitter(
-    retry: 5,
+    retry: 5,                          // 5 retry attempts
     jitterFactor: 0.2,                 // ±20% randomization
     maxInterval: .seconds(30),         // Cap at 30 seconds
     multiplier: 2.0,
@@ -60,17 +91,17 @@ let strategy = RetryStrategy.exponentialWithJitter(
 
 **Without jitter:**
 ```
-Client 1: 0s → 1s → 2s → 4s → 8s
-Client 2: 0s → 1s → 2s → 4s → 8s
-Client 3: 0s → 1s → 2s → 4s → 8s
+Client 1: 0s(init) → 1s → 2s → 4s → 8s → 16s
+Client 2: 0s(init) → 1s → 2s → 4s → 8s → 16s
+Client 3: 0s(init) → 1s → 2s → 4s → 8s → 16s
 All hit server simultaneously! 💥
 ```
 
 **With jitter:**
 ```
-Client 1: 0s → 0.9s → 2.1s → 3.8s → 8.2s
-Client 2: 0s → 1.1s → 1.9s → 4.3s → 7.7s
-Client 3: 0s → 0.8s → 2.2s → 3.9s → 8.1s
+Client 1: 0s(init) → 0.9s → 2.1s → 3.8s → 8.2s → 15.7s
+Client 2: 0s(init) → 1.1s → 1.9s → 4.3s → 7.7s → 16.4s
+Client 3: 0s(init) → 0.8s → 2.2s → 3.9s → 8.1s → 15.8s
 Traffic spread out! ✅
 ```
 
@@ -80,17 +111,19 @@ Prevent delays from growing unbounded:
 
 ```swift
 .exponentialWithJitter(
-    retry: 10,
+    retry: 10,                      // 10 retry attempts = 11 total
     jitterFactor: 0.1,
-    maxInterval: .seconds(60),  // Never wait more than 60 seconds
+    maxInterval: .seconds(60),      // Never wait more than 60 seconds
     multiplier: 2.0,
     duration: .seconds(1)
 )
 ```
 
-**Without cap:** 1s → 2s → 4s → 8s → 16s → 32s → 64s → 128s → 256s...
+**Without cap:** 
+Initial → 1s → 2s → 4s → 8s → 16s → 32s → 64s → 128s → 256s → 512s
 
-**With 60s cap:** 1s → 2s → 4s → 8s → 16s → 32s → 60s → 60s → 60s...
+**With 60s cap:** 
+Initial → 1s → 2s → 4s → 8s → 16s → 32s → 60s → 60s → 60s → 60s
 
 ## Advanced Patterns
 
@@ -132,7 +165,8 @@ func fetchWithConditionalRetry() async throws -> Data {
     } catch let error as RetryPolicyError {
         switch error {
         case .retryLimitExceeded:
-            // Retry linit exceeded
+            // All retry attempts exhausted
+            print("Retry limit exceeded after multiple attempts")
             throw error
         }
     }
@@ -200,6 +234,7 @@ actor AdaptiveRetryService {
     private func selectStrategy() -> RetryPolicyStrategy {
         if consecutiveFailures >= maxConsecutiveFailures {
             // System under stress - use conservative strategy
+            // 1 initial + 3 retries with longer delays
             return .exponentialWithJitter(
                 retry: 3,
                 jitterFactor: 0.3,
@@ -209,6 +244,7 @@ actor AdaptiveRetryService {
             )
         } else {
             // Normal operation - use standard strategy
+            // 1 initial + 4 retries
             return .exponential(
                 retry: 4,
                 multiplier: 2.0,

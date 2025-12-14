@@ -33,7 +33,6 @@ This will:
 - Try your operation immediately
 - If it fails, wait 1 second and retry
 - Repeat up to 3 times
-- Throw the last error if all attempts fail
 
 ### Network Request Example
 
@@ -75,7 +74,7 @@ Best for predictable, fixed delays:
 .constant(retry: 5, duration: .seconds(2))
 ```
 
-**Timeline:** 0s → 2s → 2s → 2s → 2s
+**Timeline:** 0s (initial) → 2s → 2s → 2s → 2s → 2s
 
 ### Exponential Strategy
 
@@ -86,7 +85,7 @@ Ideal for backing off from failing services:
 .exponential(retry: 4, multiplier: 2.0, duration: .seconds(1))
 ```
 
-**Timeline:** 0s → 1s → 2s → 4s
+**Timeline:** 0s (initial) → 1s → 2s → 4s → 8s
 
 ### Exponential with Jitter
 
@@ -103,7 +102,7 @@ Best for preventing thundering herd problems:
 )
 ```
 
-**Timeline:** 0s → ~1s → ~2s → ~4s → ~8s (with randomization)
+**Timeline:** 0s (initial) → ~1s → ~2s → ~4s → ~8s → ~16s (with randomization)
 
 ## Common Patterns
 

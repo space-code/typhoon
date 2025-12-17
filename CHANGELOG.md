@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#27](https://github.com/space-code/typhoon/pull/27).
 
 ### Miscellaneous Tasks
+- Fix typos
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#52](https://github.com/space-code/typhoon/pull/52).
 - Automate code formatting and linting with github actions
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#47](https://github.com/space-code/typhoon/pull/47).
 - Add SPM build checks for Android and Linux
@@ -59,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Contributed by [@renovate[bot]](https://github.com/renovate[bot]) in Pull Request [#29](https://github.com/space-code/typhoon/pull/29).
 
 ### New Contributors
-* @renovate[bot] made their first contribution in [#50](https://github.com/space-code/typhoon/pull/50)
+* @renovate[bot] made their first contribution in 
 
 ## [1.3.0](https://github.com/space-code/typhoon/releases/tag/1.3.0)
 

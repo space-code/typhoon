@@ -123,7 +123,7 @@ import Typhoon
 
 // Retry up to 5 times with 2 seconds between each attempt
 let service = RetryPolicyService(
-    strategy: .constant(retry: 5, duration: .seconds(2))
+    strategy: .constant(retry: 4, duration: .seconds(2))
 )
 
 do {
@@ -152,7 +152,7 @@ import Typhoon
 // Retry up to 4 times with exponentially increasing delays
 let service = RetryPolicyService(
     strategy: .exponential(
-        retry: 4,
+        retry: 3,
         multiplier: 2.0,
         duration: .seconds(1)
     )
@@ -300,7 +300,7 @@ class PaymentService {
 
 ## Documentation
 
-Comprehensive documentation is available: [Typhoon Documentation](https://space-code.github.io/typhoon/typhoon/documentation/typhoon/)
+Comprehensive documentation is available: [Typhoon Documentation](https://space-code.github.io/typhoon/)
 
 ## Contributing
 

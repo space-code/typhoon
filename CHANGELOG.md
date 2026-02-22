@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 
 ### Features
+- Introduce linear delay strategy
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#73](https://github.com/space-code/typhoon/pull/73).
 - Remove the `exponentialWithJitter` case
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#71](https://github.com/space-code/typhoon/pull/71).
 

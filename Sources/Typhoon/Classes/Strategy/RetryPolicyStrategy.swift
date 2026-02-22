@@ -16,6 +16,17 @@ public enum RetryPolicyStrategy: Sendable {
     ///   - duration: The initial duration between retries.
     case constant(retry: UInt, duration: DispatchTimeInterval)
 
+    /// A retry strategy with a linearly increasing delay.
+    ///
+    /// The delay grows proportionally with each retry attempt:
+    /// `duration * (retryIndex + 1)`.
+    ///
+    /// - Parameters:
+    ///   - retry: The maximum number of retry attempts.
+    ///   - duration: The base delay used to calculate
+    ///               the linear backoff interval.
+    case linear(retry: UInt, duration: DispatchTimeInterval)
+
     /// A retry strategy with exponential increase in duration between retries and added jitter.
     ///
     /// - Parameters:
@@ -39,6 +50,8 @@ public enum RetryPolicyStrategy: Sendable {
             retry
         case let .exponential(retry, _, _, _, _):
             retry
+        case let .linear(retry, _):
+            retry
         }
     }
 
@@ -49,6 +62,8 @@ public enum RetryPolicyStrategy: Sendable {
             duration
         case let .exponential(_, _, _, _, duration):
             duration
+        case let .linear(_, duration):
+            duration
         }
     }
 }
@@ -56,15 +71,17 @@ public enum RetryPolicyStrategy: Sendable {
 extension RetryPolicyStrategy {
     var strategy: IRetryDelayStrategy {
         switch self {
-        case let .exponential(retry, jitterFactor, maxInterval, multiplier, duration):
+        case let .exponential(_, jitterFactor, maxInterval, multiplier, duration):
             ExponentialDelayStrategy(
                 duration: duration,
                 multiplier: multiplier,
                 jitterFactor: jitterFactor,
                 maxInterval: maxInterval
             )
-        case let .constant(retry, duration):
+        case let .constant(_, duration):
             ConstantDelayStrategy(duration: duration)
+        case let .linear(_, duration):
+            LinearDelayStrategy(duration: duration)
         }
     }
 }

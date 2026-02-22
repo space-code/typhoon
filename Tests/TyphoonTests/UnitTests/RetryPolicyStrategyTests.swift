@@ -34,6 +34,14 @@ final class RetryPolicyStrategyTests: XCTestCase {
         // then
         XCTAssertEqual(duration, .second)
     }
+
+    func test_thatRetryPolicyStrategyReturnsDuration_whenTypeIsLinear() {
+        // when
+        let duration = RetryPolicyStrategy.linear(retry: .retry, duration: .second).duration
+
+        // then
+        XCTAssertEqual(duration, .second)
+    }
 }
 
 // MARK: Constants

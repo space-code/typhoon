@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove the `exponentialWithJitter` case
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#71](https://github.com/space-code/typhoon/pull/71).
 
+### Miscellaneous Tasks
+- Add  optional max duration
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#75](https://github.com/space-code/typhoon/pull/75).
+
 ### Refactor
 - Extract delay calculation into strategy implementations
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#72](https://github.com/space-code/typhoon/pull/72).

@@ -104,6 +104,9 @@ case constant(retry: Int, duration: DispatchTimeInterval)
 /// A retry strategy with a linearly increasing delay.
 case linear(retry: UInt, duration: DispatchTimeInterval)
 
+/// A retry strategy with a Fibonacci-based delay progression.
+case fibonacci(retry: UInt, duration: DispatchTimeInterval)
+
 /// A retry strategy with exponential increase in duration between retries and added jitter.
 case exponential(
     retry: Int, 

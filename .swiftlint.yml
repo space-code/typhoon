@@ -98,7 +98,7 @@ identifier_name:
   excluded:
     - id
     - URL
-
+    - n
 analyzer_rules:
   - unused_import
   - unused_declaration

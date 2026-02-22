@@ -27,6 +27,17 @@ public enum RetryPolicyStrategy: Sendable {
     ///               the linear backoff interval.
     case linear(retry: UInt, duration: DispatchTimeInterval)
 
+    /// A retry strategy with a Fibonacci-based delay progression.
+    ///
+    /// The delay grows according to the Fibonacci sequence:
+    /// `duration * fibonacci(retryIndex + 1)`.
+    ///
+    /// - Parameters:
+    ///   - retry: The maximum number of retry attempts.
+    ///   - duration: The base delay used to calculate
+    ///               the Fibonacci backoff interval.
+    case fibonacci(retry: UInt, duration: DispatchTimeInterval)
+
     /// A retry strategy with exponential increase in duration between retries and added jitter.
     ///
     /// - Parameters:
@@ -52,6 +63,8 @@ public enum RetryPolicyStrategy: Sendable {
             retry
         case let .linear(retry, _):
             retry
+        case let .fibonacci(retry, _):
+            retry
         }
     }
 
@@ -63,6 +76,8 @@ public enum RetryPolicyStrategy: Sendable {
         case let .exponential(_, _, _, _, duration):
             duration
         case let .linear(_, duration):
+            duration
+        case let .fibonacci(_, duration):
             duration
         }
     }
@@ -82,6 +97,8 @@ extension RetryPolicyStrategy {
             ConstantDelayStrategy(duration: duration)
         case let .linear(_, duration):
             LinearDelayStrategy(duration: duration)
+        case let .fibonacci(_, duration):
+            FibonacciDelayStrategy(duration: duration)
         }
     }
 }

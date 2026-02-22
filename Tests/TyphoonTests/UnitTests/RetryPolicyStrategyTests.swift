@@ -42,6 +42,14 @@ final class RetryPolicyStrategyTests: XCTestCase {
         // then
         XCTAssertEqual(duration, .second)
     }
+
+    func test_thatRetryPolicyStrategyReturnsDuration_whenTypeIsFibonacci() {
+        // when
+        let duration = RetryPolicyStrategy.fibonacci(retry: .retry, duration: .second).duration
+
+        // then
+        XCTAssertEqual(duration, .second)
+    }
 }
 
 // MARK: Constants

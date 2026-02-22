@@ -56,13 +56,21 @@ public final class RetryPolicyService {
     /// The strategy defining the behavior of the retry policy.
     private let strategy: RetryPolicyStrategy
 
+    /// Optional maximum total duration allowed for all retry attempts.
+    private let maxTotalDuration: DispatchTimeInterval?
+
     // MARK: Initialization
 
-    /// Creates a new `RetryPolicyService` instance.
+    /// Initializes a new instance of `RetryPolicyService`.
     ///
-    /// - Parameter strategy: The strategy defining the behavior of the retry policy.
-    public init(strategy: RetryPolicyStrategy) {
+    /// - Parameters:
+    ///   - strategy: The strategy that determines how retries are performed.
+    ///   - maxTotalDuration: Optional maximum duration for all retries combined. If `nil`,
+    ///                       retries can continue indefinitely based on the
+    /// strategy.
+    public init(strategy: RetryPolicyStrategy, maxTotalDuration: DispatchTimeInterval? = nil) {
         self.strategy = strategy
+        self.maxTotalDuration = maxTotalDuration
     }
 }
 
@@ -86,7 +94,13 @@ extension RetryPolicyService: IRetryPolicyService {
 
         var iterator = RetrySequence(strategy: effectiveStrategy).makeIterator()
 
+        let deadline = maxTotalDuration?.double.map { Date().addingTimeInterval($0) }
+
         while true {
+            if let deadline, Date() > deadline {
+                throw RetryPolicyError.totalDurationExceeded
+            }
+
             do {
                 return try await closure()
             } catch {

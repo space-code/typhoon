@@ -257,6 +257,109 @@ final class RetryPolicyServiceTests: XCTestCase {
         let lastError = await errorContainer.getError()
         XCTAssertNotNil(lastError)
     }
+
+    // MARK: Tests - Max Total Duration
+
+    func test_thatRetryThrowsTotalDurationExceededError_whenDeadlineIsExceeded() async throws {
+        // given
+        let slowService = RetryPolicyService(
+            strategy: .constant(retry: 10, duration: .milliseconds(200)),
+            maxTotalDuration: .milliseconds(300)
+        )
+
+        // when
+        var receivedError: Error?
+        do {
+            _ = try await slowService.retry {
+                throw URLError(.unknown)
+            }
+        } catch {
+            receivedError = error
+        }
+
+        // then
+        XCTAssertEqual(receivedError as? RetryPolicyError, .totalDurationExceeded)
+    }
+
+    func test_thatRetrySucceeds_whenOperationCompletesBeforeDeadline() async throws {
+        // given
+        let expectedValue = 42
+        let service = RetryPolicyService(
+            strategy: .constant(retry: 5, duration: .nanoseconds(1)),
+            maxTotalDuration: .seconds(5)
+        )
+
+        // when
+        let result = try await service.retry {
+            expectedValue
+        }
+
+        // then
+        XCTAssertEqual(result, expectedValue)
+    }
+
+    func test_thatRetrySucceedsAfterRetries_whenDeadlineIsNotExceeded() async throws {
+        // given
+        let counter = Counter()
+        let expectedValue = 99
+        let service = RetryPolicyService(
+            strategy: .constant(retry: 5, duration: .nanoseconds(1)),
+            maxTotalDuration: .seconds(5)
+        )
+
+        // when
+        let result = try await service.retry {
+            let count = await counter.increment()
+            if count >= 3 { return expectedValue }
+            throw URLError(.unknown)
+        }
+
+        // then
+        XCTAssertEqual(result, expectedValue)
+    }
+
+    func test_thatRetryThrowsTotalDurationExceeded_notRetryLimitExceeded_whenDeadlineHitsFirst() async throws {
+        // given
+        let service = RetryPolicyService(
+            strategy: .constant(retry: 100, duration: .milliseconds(100)),
+            maxTotalDuration: .milliseconds(250)
+        )
+
+        // when
+        var receivedError: Error?
+        do {
+            _ = try await service.retry {
+                throw URLError(.unknown)
+            }
+        } catch {
+            receivedError = error
+        }
+
+        // then
+        XCTAssertEqual(receivedError as? RetryPolicyError, .totalDurationExceeded)
+        XCTAssertNotEqual(receivedError as? RetryPolicyError, .retryLimitExceeded)
+    }
+
+    func test_thatRetryIgnoresDeadline_whenMaxTotalDurationIsNil() async throws {
+        // given
+        let counter = Counter()
+        let service = RetryPolicyService(
+            strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1)),
+            maxTotalDuration: nil
+        )
+
+        // when
+        do {
+            _ = try await service.retry {
+                _ = await counter.increment()
+                throw URLError(.unknown)
+            }
+        } catch {}
+
+        // then
+        let attempts = await counter.getValue()
+        XCTAssertEqual(attempts, .defaultRetryCount + 1)
+    }
 }
 
 // MARK: - Counter

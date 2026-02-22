@@ -9,4 +9,6 @@ import Foundation
 public enum RetryPolicyError: Error {
     /// The retry limit for attempts to perform a request has been exceeded.
     case retryLimitExceeded
+    /// Thrown when the total allowed duration for retries has been exceeded.
+    case totalDurationExceeded
 }

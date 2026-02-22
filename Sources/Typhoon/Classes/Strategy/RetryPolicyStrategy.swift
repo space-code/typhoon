@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - RetryPolicyStrategy
+
 /// A strategy used to define different retry policies.
 public enum RetryPolicyStrategy: Sendable {
     /// A retry strategy with a constant number of attempts and fixed duration between retries.
@@ -12,7 +14,7 @@ public enum RetryPolicyStrategy: Sendable {
     /// - Parameters:
     ///   - retry: The number of retry attempts.
     ///   - duration: The initial duration between retries.
-    case constant(retry: Int, duration: DispatchTimeInterval)
+    case constant(retry: UInt, duration: DispatchTimeInterval)
 
     /// A retry strategy with exponential increase in duration between retries and added jitter.
     ///
@@ -23,7 +25,7 @@ public enum RetryPolicyStrategy: Sendable {
     ///   - multiplier: The multiplier for calculating the exponential backoff duration (default is 2).
     ///   - duration: The initial duration between retries.
     case exponential(
-        retry: Int,
+        retry: UInt,
         jitterFactor: Double = 0.1,
         maxInterval: DispatchTimeInterval? = .seconds(60),
         multiplier: Double = 2,
@@ -31,7 +33,7 @@ public enum RetryPolicyStrategy: Sendable {
     )
 
     /// The number of retry attempts based on the strategy.
-    public var retries: Int {
+    public var retries: UInt {
         switch self {
         case let .constant(retry, _):
             retry
@@ -47,6 +49,22 @@ public enum RetryPolicyStrategy: Sendable {
             duration
         case let .exponential(_, _, _, _, duration):
             duration
+        }
+    }
+}
+
+extension RetryPolicyStrategy {
+    var strategy: IRetryDelayStrategy {
+        switch self {
+        case let .exponential(retry, jitterFactor, maxInterval, multiplier, duration):
+            ExponentialDelayStrategy(
+                duration: duration,
+                multiplier: multiplier,
+                jitterFactor: jitterFactor,
+                maxInterval: maxInterval
+            )
+        case let .constant(retry, duration):
+            ConstantDelayStrategy(duration: duration)
         }
     }
 }

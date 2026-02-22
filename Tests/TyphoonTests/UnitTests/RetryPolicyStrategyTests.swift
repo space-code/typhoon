@@ -38,8 +38,8 @@ final class RetryPolicyStrategyTests: XCTestCase {
 
 // MARK: Constants
 
-private extension Int {
-    static let retry = 5
+private extension UInt {
+    static let retry: UInt = 5
 }
 
 private extension DispatchTimeInterval {

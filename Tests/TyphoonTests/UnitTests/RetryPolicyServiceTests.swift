@@ -171,7 +171,7 @@ final class RetryPolicyServiceTests: XCTestCase {
     func test_thatRetryInvokesOnFailureMultipleTimes_whenMultipleRetriesFail() async {
         // given
         let counter = Counter()
-        let expectedCallCount = 3
+        let expectedCallCount: UInt = 3
 
         // when
         do {
@@ -242,14 +242,14 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: errors.count, duration: .nanoseconds(1)),
+                strategy: .constant(retry: UInt(errors.count), duration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
                     return true
                 }
             ) {
                 let index = await counter.increment() - 1
-                throw errors[min(index, errors.count - 1)]
+                throw errors[min(Int(index), errors.count - 1)]
             }
         } catch {}
 
@@ -264,16 +264,16 @@ final class RetryPolicyServiceTests: XCTestCase {
 private actor Counter {
     // MARK: Properties
 
-    private var value: Int = 0
+    private var value: UInt = 0
 
     // MARK: Internal
 
-    func increment() -> Int {
+    func increment() -> UInt {
         value += 1
         return value
     }
 
-    func getValue() -> Int {
+    func getValue() -> UInt {
         value
     }
 }
@@ -298,6 +298,6 @@ private actor ErrorContainer {
 
 // MARK: - Constants
 
-private extension Int {
-    static let defaultRetryCount = 5
+private extension UInt {
+    static let defaultRetryCount: UInt = 5
 }

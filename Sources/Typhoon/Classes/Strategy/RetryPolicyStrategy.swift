@@ -14,14 +14,6 @@ public enum RetryPolicyStrategy: Sendable {
     ///   - duration: The initial duration between retries.
     case constant(retry: Int, duration: DispatchTimeInterval)
 
-    /// A retry strategy with an exponential increase in duration between retries.
-    ///
-    /// - Parameters:
-    ///   - retry: The number of retry attempts.
-    ///   - multiplier: The multiplier for calculating the exponential backoff duration (default is 2).
-    ///   - duration: The initial duration between retries.
-    case exponential(retry: Int, multiplier: Double = 2, duration: DispatchTimeInterval)
-
     /// A retry strategy with exponential increase in duration between retries and added jitter.
     ///
     /// - Parameters:
@@ -30,7 +22,7 @@ public enum RetryPolicyStrategy: Sendable {
     ///   - maxInterval: The maximum allowed interval between retries (default is 60 seconds).
     ///   - multiplier: The multiplier for calculating the exponential backoff duration (default is 2).
     ///   - duration: The initial duration between retries.
-    case exponentialWithJitter(
+    case exponential(
         retry: Int,
         jitterFactor: Double = 0.1,
         maxInterval: DispatchTimeInterval? = .seconds(60),
@@ -43,9 +35,7 @@ public enum RetryPolicyStrategy: Sendable {
         switch self {
         case let .constant(retry, _):
             retry
-        case let .exponential(retry, _, _):
-            retry
-        case let .exponentialWithJitter(retry, _, _, _, _):
+        case let .exponential(retry, _, _, _, _):
             retry
         }
     }
@@ -55,9 +45,7 @@ public enum RetryPolicyStrategy: Sendable {
         switch self {
         case let .constant(_, duration):
             duration
-        case let .exponential(_, _, duration):
-            duration
-        case let .exponentialWithJitter(_, _, _, _, duration):
+        case let .exponential(_, _, _, _, duration):
             duration
         }
     }

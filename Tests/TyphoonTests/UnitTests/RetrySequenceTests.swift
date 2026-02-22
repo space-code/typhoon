@@ -24,7 +24,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponential() {
         // given
-        let sequence = RetrySequence(strategy: .exponential(retry: .retry, duration: .nanosecond))
+        let sequence = RetrySequence(strategy: .exponential(retry: .retry, jitterFactor: .zero, duration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -40,7 +40,7 @@ final class RetrySequenceTests: XCTestCase {
         let jitterFactor = 0.1
 
         let sequence = RetrySequence(
-            strategy: .exponentialWithJitter(
+            strategy: .exponential(
                 retry: 5,
                 jitterFactor: jitterFactor,
                 maxInterval: nil,
@@ -76,7 +76,7 @@ final class RetrySequenceTests: XCTestCase {
         let maxIntervalNanos: UInt64 = 10 * 1_000_000_000
 
         let sequence = RetrySequence(
-            strategy: .exponentialWithJitter(
+            strategy: .exponential(
                 retry: 10,
                 jitterFactor: 0.1,
                 maxInterval: maxIntervalDuration,
@@ -104,7 +104,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceAppliesJitter_whenStrategyIsExponentialWithJitter() {
         // given
-        let strategy = RetryPolicyStrategy.exponentialWithJitter(
+        let strategy = RetryPolicyStrategy.exponential(
             retry: 30,
             jitterFactor: 0.5,
             maxInterval: nil,
@@ -142,7 +142,7 @@ final class RetrySequenceTests: XCTestCase {
     func test_thatRetrySequenceWorksWithoutMaxInterval_whenStrategyIsExponentialWithJitter() {
         // given
         let sequence = RetrySequence(
-            strategy: .exponentialWithJitter(
+            strategy: .exponential(
                 retry: 5,
                 jitterFactor: 0.1,
                 maxInterval: nil,
@@ -171,7 +171,7 @@ final class RetrySequenceTests: XCTestCase {
     func test_thatRetrySequenceDoesNotLimitASequence_whenStrategyIsExponentialWithJitterAndMaxIntervalIsNil() {
         // given
         let sequence = RetrySequence(
-            strategy: .exponentialWithJitter(
+            strategy: .exponential(
                 retry: .retry,
                 jitterFactor: .jitterFactor,
                 maxInterval: nil,

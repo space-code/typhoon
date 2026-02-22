@@ -86,14 +86,7 @@ struct RetryIterator: IteratorProtocol {
         case let .constant(_, duration):
             convertToNanoseconds(duration)
 
-        case let .exponential(_, multiplier, duration):
-            calculateExponentialDelay(
-                duration: duration,
-                multiplier: multiplier,
-                retries: retries
-            )
-
-        case let .exponentialWithJitter(_, jitterFactor, maxInterval, multiplier, duration):
+        case let .exponential(_, jitterFactor, maxInterval, multiplier, duration):
             calculateExponentialDelayWithJitter(
                 duration: duration,
                 multiplier: multiplier,

@@ -79,7 +79,7 @@ When creating a bug report, include:
 **Title:** ExponentialWithJitter strategy returns incorrect delay
 
 **Steps to reproduce:**
-1. Create RetryPolicyService with exponentialWithJitter strategy
+1. Create RetryPolicyService with exponential strategy
 2. Set maxInterval to 30 seconds
 3. Observe delays exceeding maxInterval
 
@@ -94,7 +94,7 @@ When creating a bug report, include:
 **Code:**
 \`\`\`swift
 let service = RetryPolicyService(
-    strategy: .exponentialWithJitter(
+    strategy: .exponential(
         retry: 5,
         maxInterval: .seconds(30),
         duration: .seconds(1)
@@ -219,7 +219,7 @@ Closes #45
 
 ---
 
-fix(strategy): correct maxInterval comparison in exponentialWithJitter
+fix(strategy): correct maxInterval comparison in exponential
 
 maxInterval was compared in seconds instead of nanoseconds, causing
 delays to be capped incorrectly. Now properly converts maxInterval

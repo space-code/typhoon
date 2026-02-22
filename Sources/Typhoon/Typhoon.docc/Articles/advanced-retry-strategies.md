@@ -80,7 +80,7 @@ let strategy = RetryStrategy.exponential(
 When multiple clients retry simultaneously, they can overwhelm a recovering service. Jitter adds randomization to prevent this:
 
 ```swift
-let strategy = RetryStrategy.exponentialWithJitter(
+let strategy = RetryStrategy.exponential(
     retry: 5,                          // 5 retry attempts
     jitterFactor: 0.2,                 // ±20% randomization
     maxInterval: .seconds(30),         // Cap at 30 seconds
@@ -110,7 +110,7 @@ Traffic spread out! ✅
 Prevent delays from growing unbounded:
 
 ```swift
-.exponentialWithJitter(
+.exponential(
     retry: 10,                      // 10 retry attempts = 11 total
     jitterFactor: 0.1,
     maxInterval: .seconds(60),      // Never wait more than 60 seconds
@@ -235,7 +235,7 @@ actor AdaptiveRetryService {
         if consecutiveFailures >= maxConsecutiveFailures {
             // System under stress - use conservative strategy
             // 1 initial + 3 retries with longer delays
-            return .exponentialWithJitter(
+            return .exponential(
                 retry: 3,
                 jitterFactor: 0.3,
                 maxInterval: 120,

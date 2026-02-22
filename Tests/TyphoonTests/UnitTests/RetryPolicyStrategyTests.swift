@@ -29,7 +29,7 @@ final class RetryPolicyStrategyTests: XCTestCase {
 
     func test_thatRetryPolicyStrategyReturnsDuration_whenTypeIsExponentialWithJitter() {
         // when
-        let duration = RetryPolicyStrategy.exponentialWithJitter(retry: .retry, duration: .second).duration
+        let duration = RetryPolicyStrategy.exponential(retry: .retry, duration: .second).duration
 
         // then
         XCTAssertEqual(duration, .second)

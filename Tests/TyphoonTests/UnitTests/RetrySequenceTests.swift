@@ -22,6 +22,17 @@ final class RetrySequenceTests: XCTestCase {
         XCTAssertEqual(result, [1, 1, 1, 1, 1, 1, 1, 1])
     }
 
+    func test_thatRetrySequenceCreatesASequence_whenStrategyIsLinear() {
+        // given
+        let sequence = RetrySequence(strategy: .linear(retry: .retry, duration: .nanosecond))
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result, [1, 2, 3, 4, 5, 6, 7, 8])
+    }
+
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponential() {
         // given
         let sequence = RetrySequence(strategy: .exponential(retry: .retry, jitterFactor: .zero, duration: .nanosecond))

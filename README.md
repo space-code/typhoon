@@ -101,6 +101,9 @@ Typhoon provides three powerful retry strategies to handle different failure sce
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
 case constant(retry: Int, duration: DispatchTimeInterval)
 
+/// A retry strategy with a linearly increasing delay.
+case linear(retry: UInt, duration: DispatchTimeInterval)
+
 /// A retry strategy with exponential increase in duration between retries and added jitter.
 case exponential(
     retry: Int, 

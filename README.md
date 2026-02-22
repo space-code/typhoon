@@ -101,11 +101,8 @@ Typhoon provides three powerful retry strategies to handle different failure sce
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
 case constant(retry: Int, duration: DispatchTimeInterval)
 
-/// A retry strategy with an exponential increase in duration between retries.
-case exponential(retry: Int, multiplier: Double = 2.0, duration: DispatchTimeInterval)
-
 /// A retry strategy with exponential increase in duration between retries and added jitter.
-case exponentialWithJitter(
+case exponential(
     retry: Int, 
     jitterFactor: Double = 0.1, 
     maxInterval: DispatchTimeInterval? = .seconds(60), 
@@ -182,7 +179,7 @@ import Typhoon
 
 // Retry with exponential backoff, jitter, and maximum interval cap
 let service = RetryPolicyService(
-    strategy: .exponentialWithJitter(
+    strategy: .exponential(
         retry: 5,
         jitterFactor: 0.2,      // Add ±20% randomization
         maxInterval: .seconds(30),         // Cap at 30 seconds
@@ -235,7 +232,7 @@ import Typhoon
 
 class DatabaseManager {
     private let retryService = RetryPolicyService(
-        strategy: .exponentialWithJitter(
+        strategy: .exponential(
             retry: 5,
             jitterFactor: 0.15,
             maxInterval: .seconds(60),

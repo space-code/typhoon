@@ -25,7 +25,7 @@ let apiRetry = RetryPolicyService(
 
 // ✅ High-traffic services
 let highTrafficRetry = RetryPolicyService(
-    strategy: .exponentialWithJitter(
+    strategy: .exponential(
         retry: 5,
         jitterFactor: 0.2,
         maxInterval: 60,
@@ -102,7 +102,7 @@ class NetworkRetryService {
     )
     
     static let critical = RetryPolicyService(
-        strategy: .exponentialWithJitter(
+        strategy: .exponential(
             retry: 5,
             jitterFactor: 0.2,
             maxInterval: 60,
@@ -193,7 +193,7 @@ let badService = RetryPolicyService(
 
 // ✅ Good - Reasonable limits
 let goodService = RetryPolicyService(
-    strategy: .exponentialWithJitter(
+    strategy: .exponential(
         retry: 5,
         maxInterval: 60,
         duration: .seconds(1)

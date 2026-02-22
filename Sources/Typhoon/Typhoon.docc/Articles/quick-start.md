@@ -93,7 +93,7 @@ Best for preventing thundering herd problems:
 
 ```swift
 // Retry with exponential backoff, jitter, and cap
-.exponentialWithJitter(
+.exponential(
     retry: 5,
     jitterFactor: 0.2,
     maxInterval: .seconds(30),
@@ -166,7 +166,7 @@ let networkRetry = RetryPolicyService(
 
 // Critical operations (payments, data persistence)
 let criticalRetry = RetryPolicyService(
-    strategy: .exponentialWithJitter(
+    strategy: .exponential(
         retry: 5,
         jitterFactor: 0.15,
         maxInterval: .seconds(60),

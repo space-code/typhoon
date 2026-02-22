@@ -24,6 +24,6 @@ struct RetrySequence: Sequence {
     // MARK: Sequence
 
     func makeIterator() -> RetryIterator {
-        RetryIterator(strategy: strategy)
+        RetryIterator(maxRetries: strategy.retries, delayStrategy: strategy.strategy)
     }
 }

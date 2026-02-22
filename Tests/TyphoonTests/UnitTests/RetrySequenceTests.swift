@@ -203,8 +203,8 @@ final class RetrySequenceTests: XCTestCase {
 
 // MARK: - Constant
 
-private extension Int {
-    static let retry: Int = 8
+private extension UInt {
+    static let retry: UInt = 8
 }
 
 private extension UInt64 {

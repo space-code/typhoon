@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix typos in the documentation
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 
+### Features
+- Remove the `exponentialWithJitter` case
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#71](https://github.com/space-code/typhoon/pull/71).
+
 ## [1.4.0](https://github.com/space-code/typhoon/releases/tag/1.4.0)
 
 Released on 2025-12-17. All issues associated with this milestone can be found using this [filter](https://github.com/space-code/typhoon/milestones?state=closed&q=1.4.0).

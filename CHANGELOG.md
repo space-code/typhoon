@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 
 ### Features
+- Introduce chain delay strategy
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#79](https://github.com/space-code/typhoon/pull/79).
 - Introduce custom delay strategy
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#78](https://github.com/space-code/typhoon/pull/78).
 - Add retryWithResult for detailed retry results

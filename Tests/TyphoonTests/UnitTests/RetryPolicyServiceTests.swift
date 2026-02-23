@@ -3,7 +3,7 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import Typhoon
+@testable import Typhoon
 import XCTest
 
 // MARK: - RetryPolicyServiceTests
@@ -359,6 +359,32 @@ final class RetryPolicyServiceTests: XCTestCase {
         // then
         let attempts = await counter.getValue()
         XCTAssertEqual(attempts, .defaultRetryCount + 1)
+    }
+
+    func test_thatChainDelayStrategy_worksWithRetryPolicyService() async throws {
+        // given
+        let counter = Counter()
+        let service = RetryPolicyService(
+            strategy: .custom(
+                retry: 5,
+                strategy: ChainDelayStrategy(entries: [
+                    .init(retries: 3, strategy: ConstantDelayStrategy(duration: .nanoseconds(1))),
+                    .init(retries: 2, strategy: ConstantDelayStrategy(duration: .nanoseconds(1))),
+                ])
+            )
+        )
+
+        // when
+        do {
+            _ = try await service.retry {
+                _ = await counter.increment()
+                throw URLError(.unknown)
+            }
+        } catch {}
+
+        // then
+        let attempts = await counter.getValue()
+        XCTAssertEqual(attempts, 6)
     }
 }
 

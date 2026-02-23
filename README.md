@@ -148,6 +148,45 @@ do {
 - Attempt 4: After 2 seconds
 - Attempt 5: After 2 seconds
 
+### Linear Strategy
+
+Delays grow proportionally with each attempt — a middle ground between constant and exponential:
+
+```swift
+import Typhoon
+
+// Retry up to 4 times with linearly increasing delays
+let service = RetryPolicyService(
+    strategy: .linear(retry: 3, duration: .seconds(1))
+)
+```
+
+**Retry Timeline:**
+- Attempt 1: Immediate
+- Attempt 2: After 1 second  (1 × 1)
+- Attempt 3: After 2 seconds (1 × 2)
+- Attempt 4: After 3 seconds (1 × 3)
+
+### Fibonacci Strategy
+
+Delays follow the Fibonacci sequence — grows faster than linear but slower than exponential:
+
+```swift
+import Typhoon
+
+let service = RetryPolicyService(
+    strategy: .fibonacci(retry: 5, duration: .seconds(1))
+)
+```
+
+**Retry Timeline:**
+- Attempt 1: Immediate
+- Attempt 2: After 1 second
+- Attempt 3: After 1 second
+- Attempt 4: After 2 seconds
+- Attempt 5: After 3 seconds
+- Attempt 6: After 5 seconds
+
 ### Exponential Strategy
 
 Ideal for avoiding overwhelming a failing service by progressively increasing wait times:
@@ -159,6 +198,7 @@ import Typhoon
 let service = RetryPolicyService(
     strategy: .exponential(
         retry: 3,
+        jitterFactor: 0,
         multiplier: 2.0,
         duration: .seconds(1)
     )
@@ -210,6 +250,71 @@ do {
 - Prevents multiple clients from retrying simultaneously
 - Reduces load spikes on recovering services
 - Improves overall system resilience
+
+### Custom Strategy
+
+Provide your own delay logic by implementing `IRetryDelayStrategy`:
+
+```swift
+import Typhoon
+
+struct QuadraticDelayStrategy: IRetryDelayStrategy {
+    func delay(forRetry retries: UInt) -> UInt64? {
+        let seconds = Double(retries * retries) // 0s, 1s, 4s, 9s...
+        return UInt64(seconds * 1_000_000_000)
+    }
+}
+
+let service = RetryPolicyService(
+    strategy: .custom(retry: 4, strategy: QuadraticDelayStrategy())
+)
+```
+
+### Chain Strategy
+
+Combines multiple strategies executed sequentially. Each strategy runs independently with its own delay logic, making it ideal for phased retry approaches — e.g. react quickly first, then back off gradually.
+
+```swift
+import Typhoon
+
+let service = RetryPolicyService(
+    strategy: .chain([
+        // Phase 1: 3 quick attempts with constant delay
+        .init(retries: 3, strategy: ConstantDelayStrategy(duration: .milliseconds(100))),
+        // Phase 2: 3 slower attempts with exponential backoff
+        .init(retries: 3, strategy: ExponentialDelayStrategy(
+            duration: .seconds(1),
+            multiplier: 2.0,
+            jitterFactor: 0.1,
+            maxInterval: .seconds(60)
+        ))
+    ])
+)
+
+do {
+    let result = try await service.retry {
+        try await fetchDataFromAPI()
+    }
+} catch {
+    print("Failed after all phases")
+}
+```
+
+**Retry Timeline:**
+```
+Attempt 1: immediate
+Attempt 2: 100ms  ┐
+Attempt 3: 100ms  ├─ Phase 1: Constant
+Attempt 4: 100ms  ┘
+Attempt 5: 1s     ┐
+Attempt 6: 2s     ├─ Phase 2: Exponential
+Attempt 7: 4s     ┘
+```
+
+The total retry count is calculated automatically from the sum of all entries — no need to specify it manually.
+
+Each strategy in the chain uses **local indexing**, meaning every phase starts its delay calculation from zero. This ensures each strategy behaves predictably regardless of its position in the chain.
+
 
 ## Common Use Cases
 

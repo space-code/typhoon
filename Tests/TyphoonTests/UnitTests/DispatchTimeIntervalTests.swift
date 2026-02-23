@@ -9,48 +9,48 @@ import XCTest
 // MARK: - DispatchTimeIntervalTests
 
 final class DispatchTimeIntervalTests: XCTestCase {
-    func test_thatDispatchTimeIntervalConvertsMillisecondsToDouble() {
+    func test_thatDispatchTimeIntervalConvertsMillisecondsToNanoseconds() {
         // given
         let interval = DispatchTimeInterval.milliseconds(.value)
 
         // when
-        let result = interval.double
+        let result = interval.nanoseconds
 
         // then
-        XCTAssertEqual(result, Double(Int.value) * 1e-3)
+        XCTAssertEqual(result, UInt64(Int.value) * 1_000_000)
     }
 
-    func test_thatDispatchTimeIntervalConvertsSecondsToDouble() {
+    func test_thatDispatchTimeIntervalConvertsSecondsToNanoseconds() {
         // given
         let interval = DispatchTimeInterval.seconds(.value)
 
         // when
-        let result = interval.double
+        let result = interval.nanoseconds
 
         // then
-        XCTAssertEqual(result, Double(Int.value))
+        XCTAssertEqual(result, UInt64(Int.value) * 1_000_000_000)
     }
 
-    func test_thatDispatchTimeIntervalConvertsMicrosecondsToDouble() {
+    func test_thatDispatchTimeIntervalConvertsMicrosecondsToNanoseconds() {
         // given
         let interval = DispatchTimeInterval.microseconds(.value)
 
         // when
-        let result = interval.double
+        let result = interval.nanoseconds
 
         // then
-        XCTAssertEqual(result, Double(Int.value) * 1e-6)
+        XCTAssertEqual(result, UInt64(Int.value) * 1000)
     }
 
-    func test_thatDispatchTimeIntervalConvertsNanosecondsToDouble() {
+    func test_thatDispatchTimeIntervalConvertsNanosecondsToNanoseconds() {
         // given
         let interval = DispatchTimeInterval.nanoseconds(.value)
 
         // when
-        let result = interval.double
+        let result = interval.nanoseconds
 
         // then
-        XCTAssertEqual(result, Double(Int.value) * 1e-9)
+        XCTAssertEqual(result, UInt64(Int.value))
     }
 
     func test_thatDispatchTimeIntervalReturnsNil_whenIntervalIsEqualToNever() {
@@ -58,7 +58,7 @@ final class DispatchTimeIntervalTests: XCTestCase {
         let interval = DispatchTimeInterval.never
 
         // when
-        let result = interval.double
+        let result = interval.nanoseconds
 
         // then
         XCTAssertNil(result)

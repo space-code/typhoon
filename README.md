@@ -99,13 +99,13 @@ Typhoon provides three powerful retry strategies to handle different failure sce
 
 ```swift
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
-case constant(retry: UInt, duration: DispatchTimeInterval)
+case constant(retry: UInt, dispatchDuration: DispatchTimeInterval)
 
 /// A retry strategy with a linearly increasing delay.
-case linear(retry: UInt, duration: DispatchTimeInterval)
+case linear(retry: UInt, dispatchDuration: DispatchTimeInterval)
 
 /// A retry strategy with a Fibonacci-based delay progression.
-case fibonacci(retry: UInt, duration: DispatchTimeInterval)
+case fibonacci(retry: UInt, dispatchDuration: DispatchTimeInterval)
 
 /// A retry strategy with exponential increase in duration between retries and added jitter.
 case exponential(
@@ -113,7 +113,7 @@ case exponential(
     jitterFactor: Double = 0.1, 
     maxInterval: DispatchTimeInterval? = .seconds(60), 
     multiplier: Double = 2.0, 
-    duration: DispatchTimeInterval
+    dispatchDuration: DispatchTimeInterval
 )
 
 /// A custom retry strategy defined by a user-provided delay calculator.
@@ -129,7 +129,7 @@ import Typhoon
 
 // Retry up to 5 times with 2 seconds between each attempt
 let service = RetryPolicyService(
-    strategy: .constant(retry: 4, duration: .seconds(2))
+    strategy: .constant(retry: 4, dispatchDuration: .seconds(2))
 )
 
 do {
@@ -157,7 +157,7 @@ import Typhoon
 
 // Retry up to 4 times with linearly increasing delays
 let service = RetryPolicyService(
-    strategy: .linear(retry: 3, duration: .seconds(1))
+    strategy: .linear(retry: 3, dispatchDuration: .seconds(1))
 )
 ```
 
@@ -175,7 +175,7 @@ Delays follow the Fibonacci sequence — grows faster than linear but slower tha
 import Typhoon
 
 let service = RetryPolicyService(
-    strategy: .fibonacci(retry: 5, duration: .seconds(1))
+    strategy: .fibonacci(retry: 5, dispatchDuration: .seconds(1))
 )
 ```
 
@@ -200,7 +200,7 @@ let service = RetryPolicyService(
         retry: 3,
         jitterFactor: 0,
         multiplier: 2.0,
-        duration: .seconds(1)
+        dispatchDuration: .seconds(1)
     )
 )
 
@@ -233,7 +233,7 @@ let service = RetryPolicyService(
         jitterFactor: 0.2,      // Add ±20% randomization
         maxInterval: .seconds(30),         // Cap at 30 seconds
         multiplier: 2.0,
-        duration: .seconds(1)
+        dispatchDuration: .seconds(1)
     )
 )
 
@@ -280,10 +280,10 @@ import Typhoon
 let service = RetryPolicyService(
     strategy: .chain([
         // Phase 1: 3 quick attempts with constant delay
-        .init(retries: 3, strategy: ConstantDelayStrategy(duration: .milliseconds(100))),
+        .init(retries: 3, strategy: ConstantDelayStrategy(dispatchDuration: .milliseconds(100))),
         // Phase 2: 3 slower attempts with exponential backoff
         .init(retries: 3, strategy: ExponentialDelayStrategy(
-            duration: .seconds(1),
+            dispatchDuration: .seconds(1),
             multiplier: 2.0,
             jitterFactor: 0.1,
             maxInterval: .seconds(60)
@@ -325,7 +325,7 @@ import Typhoon
 
 class APIClient {
     private let retryService = RetryPolicyService(
-        strategy: .exponential(retry: 3, duration: .milliseconds(500))
+        strategy: .exponential(retry: 3, dispatchDuration: .milliseconds(500))
     )
     
     func fetchUser(id: String) async throws -> User {
@@ -350,7 +350,7 @@ class DatabaseManager {
             retry: 5,
             jitterFactor: 0.15,
             maxInterval: .seconds(60),
-            duration: .seconds(1)
+            dispatchDuration: .seconds(1)
         )
     )
     
@@ -369,7 +369,7 @@ import Typhoon
 
 class FileService {
     private let retryService = RetryPolicyService(
-        strategy: .constant(retry: 3, duration: .milliseconds(100))
+        strategy: .constant(retry: 3, dispatchDuration: .milliseconds(100))
     )
     
     func writeFile(data: Data, to path: String) async throws {
@@ -390,7 +390,7 @@ class PaymentService {
         strategy: .exponential(
             retry: 4,
             multiplier: 1.5,
-            duration: .seconds(2)
+            dispatchDuration: .seconds(2)
         )
     )
     

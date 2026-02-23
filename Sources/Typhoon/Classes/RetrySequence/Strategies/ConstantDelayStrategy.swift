@@ -20,7 +20,7 @@ struct ConstantDelayStrategy: IRetryDelayStrategy {
     /// - Parameter retries: The current retry attempt index (ignored).
     /// - Returns: The delay in nanoseconds.
     func delay(forRetry _: UInt) -> UInt64? {
-        guard let seconds = duration.double else { return .zero }
-        return (seconds * .nanosec).safeUInt64
+        guard let nanos = duration.nanoseconds else { return .zero }
+        return nanos
     }
 }

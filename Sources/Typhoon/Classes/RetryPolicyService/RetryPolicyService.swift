@@ -94,7 +94,9 @@ extension RetryPolicyService: IRetryPolicyService {
 
         var iterator = RetrySequence(strategy: effectiveStrategy).makeIterator()
 
-        let deadline = maxTotalDuration?.double.map { Date().addingTimeInterval($0) }
+        let deadline = maxTotalDuration?.nanoseconds.map {
+            Date().addingTimeInterval(TimeInterval($0) / 1_000_000_000)
+        }
 
         while true {
             if let deadline, Date() > deadline {

@@ -17,7 +17,7 @@ final class RetryPolicyServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = RetryPolicyService(strategy: .constant(retry: .defaultRetryCount, duration: .seconds(0)))
+        sut = RetryPolicyService(strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .seconds(0)))
     }
 
     override func tearDown() {
@@ -51,7 +51,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         var receivedError: Error?
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1)),
+                strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in false }
             ) {
                 throw originalError
@@ -86,7 +86,7 @@ final class RetryPolicyServiceTests: XCTestCase {
 
         // when
         let result = try await sut.retry(
-            strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1))
+            strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1))
         ) {
             let currentCount = await counter.increment()
 
@@ -111,7 +111,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1))
+                strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1))
             ) {
                 _ = await counter.increment()
                 throw URLError(.unknown)
@@ -130,7 +130,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1)),
+                strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in false }
             ) {
                 _ = await counter.increment()
@@ -153,7 +153,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1)),
+                strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
                     return false
@@ -176,7 +176,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: expectedCallCount, duration: .nanoseconds(1)),
+                strategy: .constant(retry: expectedCallCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in
                     true
                 }
@@ -197,7 +197,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // given
         let expectedValue = 7
         let zeroRetryStrategy = RetryPolicyService(
-            strategy: .constant(retry: 0, duration: .nanoseconds(1))
+            strategy: .constant(retry: 0, dispatchDuration: .nanoseconds(1))
         )
 
         // when
@@ -212,7 +212,7 @@ final class RetryPolicyServiceTests: XCTestCase {
     func test_thatRetryThrowsError_whenRetryCountIsZeroAndOperationFails() async throws {
         // given
         let zeroRetryStrategy = RetryPolicyService(
-            strategy: .constant(retry: 0, duration: .nanoseconds(1))
+            strategy: .constant(retry: 0, dispatchDuration: .nanoseconds(1))
         )
 
         // when
@@ -242,7 +242,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await sut.retry(
-                strategy: .constant(retry: UInt(errors.count), duration: .nanoseconds(1)),
+                strategy: .constant(retry: UInt(errors.count), dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
                     return true
@@ -263,7 +263,7 @@ final class RetryPolicyServiceTests: XCTestCase {
     func test_thatRetryThrowsTotalDurationExceededError_whenDeadlineIsExceeded() async throws {
         // given
         let slowService = RetryPolicyService(
-            strategy: .constant(retry: 10, duration: .milliseconds(200)),
+            strategy: .constant(retry: 10, dispatchDuration: .milliseconds(200)),
             maxTotalDuration: .milliseconds(300)
         )
 
@@ -285,7 +285,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // given
         let expectedValue = 42
         let service = RetryPolicyService(
-            strategy: .constant(retry: 5, duration: .nanoseconds(1)),
+            strategy: .constant(retry: 5, dispatchDuration: .nanoseconds(1)),
             maxTotalDuration: .seconds(5)
         )
 
@@ -303,7 +303,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         let counter = Counter()
         let expectedValue = 99
         let service = RetryPolicyService(
-            strategy: .constant(retry: 5, duration: .nanoseconds(1)),
+            strategy: .constant(retry: 5, dispatchDuration: .nanoseconds(1)),
             maxTotalDuration: .seconds(5)
         )
 
@@ -321,7 +321,7 @@ final class RetryPolicyServiceTests: XCTestCase {
     func test_thatRetryThrowsTotalDurationExceeded_notRetryLimitExceeded_whenDeadlineHitsFirst() async throws {
         // given
         let service = RetryPolicyService(
-            strategy: .constant(retry: 100, duration: .milliseconds(100)),
+            strategy: .constant(retry: 100, dispatchDuration: .milliseconds(100)),
             maxTotalDuration: .milliseconds(250)
         )
 
@@ -344,7 +344,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         // given
         let counter = Counter()
         let service = RetryPolicyService(
-            strategy: .constant(retry: .defaultRetryCount, duration: .nanoseconds(1)),
+            strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
             maxTotalDuration: nil
         )
 

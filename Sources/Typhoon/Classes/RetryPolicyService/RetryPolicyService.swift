@@ -120,4 +120,63 @@ extension RetryPolicyService: IRetryPolicyService {
             }
         }
     }
+
+    /// Retries a closure and returns a detailed `RetryResult` including success/failure info.
+    ///
+    /// - Parameters:
+    ///   - strategy: Optional strategy that defines the retry behavior.
+    ///   - onFailure: Optional closure called on each failure; returning `true` stops retries.
+    ///   - closure: The async closure to be retried according to the strategy.
+    ///
+    /// - Returns: A `RetryResult` containing the final value, attempt count, total duration, and encountered errors.
+    public func retryWithResult<T>(
+        strategy: RetryPolicyStrategy? = nil,
+        onFailure: (@Sendable (Error) async -> Bool)? = nil,
+        _ closure: @Sendable () async throws -> T
+    ) async throws -> RetryResult<T> {
+        let state = State()
+        let startTime = Date()
+
+        let value = try await retry(
+            strategy: strategy,
+            onFailure: { error in
+                await state.recordError(error)
+                return await onFailure?(error) ?? true
+            }, {
+                await state.recordAttempt()
+                return try await closure()
+            }
+        )
+
+        return await RetryResult(
+            value: value,
+            attempts: state.attempts,
+            totalDuration: Date().timeIntervalSince(startTime),
+            errors: state.errors
+        )
+    }
+}
+
+// MARK: RetryPolicyService.State
+
+extension RetryPolicyService {
+    /// Internal actor to track retry attempts and errors in a thread-safe manner.
+    private actor State {
+        /// Number of attempts performed so far.
+        var attempts: UInt = 0
+
+        /// List of errors encountered during retry attempts.
+        var errors: [Error] = []
+
+        /// Increments the attempt count by one.
+        func recordAttempt() {
+            attempts += 1
+        }
+
+        /// Records an error from a failed attempt.
+        /// - Parameter error: The error to record.
+        func recordError(_ error: Error) {
+            errors.append(error)
+        }
+    }
 }

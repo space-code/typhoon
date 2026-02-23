@@ -7,7 +7,7 @@
 ///
 /// Implementations can provide different backoff algorithms,
 /// such as constant, linear, exponential, or exponential with jitter.
-protocol IRetryDelayStrategy {
+public protocol IRetryDelayStrategy: Sendable {
     /// Calculates the delay before the next retry attempt.
     ///
     /// - Parameter retries: The current retry attempt index,

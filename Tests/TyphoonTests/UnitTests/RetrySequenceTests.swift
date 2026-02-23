@@ -44,6 +44,17 @@ final class RetrySequenceTests: XCTestCase {
         XCTAssertEqual(result, [1, 1, 2, 3, 5, 8, 13, 21])
     }
 
+    func test_thatRetrySequenceCreatesASequence_whenStrategyIsCustom() {
+        // given
+        let sequence = RetrySequence(strategy: .custom(retry: .retry, strategy: FibonacciDelayStrategy(duration: .nanosecond)))
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result, [1, 1, 2, 3, 5, 8, 13, 21])
+    }
+
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponential() {
         // given
         let sequence = RetrySequence(strategy: .exponential(retry: .retry, jitterFactor: .zero, duration: .nanosecond))

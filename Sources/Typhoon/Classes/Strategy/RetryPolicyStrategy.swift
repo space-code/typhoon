@@ -54,6 +54,13 @@ public enum RetryPolicyStrategy: Sendable {
         duration: DispatchTimeInterval
     )
 
+    /// A custom retry strategy defined by a user-provided delay calculator.
+    ///
+    /// - Parameters:
+    ///   - retry: The maximum number of retry attempts.
+    ///   - strategy: A custom delay strategy implementation.
+    case custom(retry: UInt, strategy: IRetryDelayStrategy)
+
     /// The number of retry attempts based on the strategy.
     public var retries: UInt {
         switch self {
@@ -65,20 +72,8 @@ public enum RetryPolicyStrategy: Sendable {
             retry
         case let .fibonacci(retry, _):
             retry
-        }
-    }
-
-    /// The time duration between retries based on the strategy.
-    public var duration: DispatchTimeInterval {
-        switch self {
-        case let .constant(_, duration):
-            duration
-        case let .exponential(_, _, _, _, duration):
-            duration
-        case let .linear(_, duration):
-            duration
-        case let .fibonacci(_, duration):
-            duration
+        case let .custom(retry, _):
+            retry
         }
     }
 }
@@ -99,6 +94,8 @@ extension RetryPolicyStrategy {
             LinearDelayStrategy(duration: duration)
         case let .fibonacci(_, duration):
             FibonacciDelayStrategy(duration: duration)
+        case let .custom(_, strategy):
+            strategy
         }
     }
 }

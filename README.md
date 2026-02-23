@@ -99,7 +99,7 @@ Typhoon provides three powerful retry strategies to handle different failure sce
 
 ```swift
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
-case constant(retry: Int, duration: DispatchTimeInterval)
+case constant(retry: UInt, duration: DispatchTimeInterval)
 
 /// A retry strategy with a linearly increasing delay.
 case linear(retry: UInt, duration: DispatchTimeInterval)
@@ -109,12 +109,15 @@ case fibonacci(retry: UInt, duration: DispatchTimeInterval)
 
 /// A retry strategy with exponential increase in duration between retries and added jitter.
 case exponential(
-    retry: Int, 
+    retry: UInt, 
     jitterFactor: Double = 0.1, 
     maxInterval: DispatchTimeInterval? = .seconds(60), 
     multiplier: Double = 2.0, 
     duration: DispatchTimeInterval
 )
+
+/// A custom retry strategy defined by a user-provided delay calculator.
+case custom(retry: UInt, strategy: IRetryDelayStrategy)
 ```
 
 ### Constant Strategy

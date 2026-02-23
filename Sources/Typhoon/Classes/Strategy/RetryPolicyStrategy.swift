@@ -78,6 +78,8 @@ public enum RetryPolicyStrategy: Sendable {
     }
 }
 
+// MARK: Strategy
+
 extension RetryPolicyStrategy {
     var strategy: IRetryDelayStrategy {
         switch self {
@@ -97,5 +99,21 @@ extension RetryPolicyStrategy {
         case let .custom(_, strategy):
             strategy
         }
+    }
+}
+
+// MARK: - Chain
+
+public extension RetryPolicyStrategy {
+    /// Creates a `.custom` retry strategy using a chained delay strategy.
+    ///
+    /// The total number of retries is automatically calculated
+    /// as the sum of all provided entries.
+    ///
+    /// - Parameter entries: Ordered delay strategy entries.
+    /// - Returns: A `.custom` strategy wrapping `ChainDelayStrategy`.
+    static func chain(_ entries: [ChainDelayStrategy.Entry]) -> RetryPolicyStrategy {
+        let chain = ChainDelayStrategy(entries: entries)
+        return .custom(retry: chain.totalRetries, strategy: chain)
     }
 }

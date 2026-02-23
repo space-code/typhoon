@@ -227,6 +227,118 @@ final class RetrySequenceTests: XCTestCase {
         XCTAssertEqual(result[7], 128, accuracy: 13)
     }
 
+    func test_thatChainDelayStrategy_returnsDelaysFromFirstStrategy() {
+        // given
+        let sut = ChainDelayStrategy(entries: [
+            .init(retries: 3, strategy: ConstantDelayStrategy(duration: .seconds(1))),
+            .init(retries: 2, strategy: ConstantDelayStrategy(duration: .seconds(5))),
+        ])
+
+        // then
+        XCTAssertNotNil(sut.delay(forRetry: 0))
+        XCTAssertNotNil(sut.delay(forRetry: 1))
+        XCTAssertNotNil(sut.delay(forRetry: 2))
+    }
+
+    func test_thatChainDelayStrategy_switchesToSecondStrategy_afterFirstExhausted() {
+        // given
+        let firstDelay: UInt64 = 1_000_000_000
+        let secondDelay: UInt64 = 5_000_000_000
+
+        let sut = ChainDelayStrategy(entries: [
+            .init(retries: 3, strategy: ConstantDelayStrategy(duration: .seconds(1))),
+            .init(retries: 2, strategy: ConstantDelayStrategy(duration: .seconds(5))),
+        ])
+
+        // then
+        XCTAssertEqual(sut.delay(forRetry: 0), firstDelay)
+        XCTAssertEqual(sut.delay(forRetry: 1), firstDelay)
+        XCTAssertEqual(sut.delay(forRetry: 2), firstDelay)
+        XCTAssertEqual(sut.delay(forRetry: 3), secondDelay)
+        XCTAssertEqual(sut.delay(forRetry: 4), secondDelay)
+    }
+
+    func test_thatChainDelayStrategy_returnsNil_whenAllStrategiesExhausted() {
+        // given
+        let sut = ChainDelayStrategy(entries: [
+            .init(retries: 3, strategy: ConstantDelayStrategy(duration: .seconds(1))),
+            .init(retries: 2, strategy: ConstantDelayStrategy(duration: .seconds(5))),
+        ])
+
+        // then
+        XCTAssertNil(sut.delay(forRetry: 5))
+    }
+
+    func test_thatRetrySequenceCreatesASequence_whenStrategyIsChainWithDifferentDelays() {
+        // given
+        let sequence = RetrySequence(
+            strategy: .chain([
+                .init(retries: 3, strategy: ConstantDelayStrategy(duration: .nanoseconds(1))),
+                .init(retries: 3, strategy: ExponentialDelayStrategy(
+                    duration: .nanoseconds(1),
+                    multiplier: 2.0,
+                    jitterFactor: 0.0,
+                    maxInterval: nil
+                )),
+            ])
+        )
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result, [1, 1, 1, 1, 2, 4])
+    }
+
+    func test_thatChainStrategy_automaticallyCalculatesTotalRetries() {
+        // given
+        let entries: [ChainDelayStrategy.Entry] = [
+            .init(retries: 3, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+            .init(retries: 2, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+        ]
+
+        // when
+        let strategy = RetryPolicyStrategy.chain(entries)
+
+        // then
+        XCTAssertEqual(strategy.retries, 5)
+    }
+
+    func test_thatChainStrategy_returnsCustomStrategy() {
+        // given
+        let entries: [ChainDelayStrategy.Entry] = [
+            .init(retries: 3, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+            .init(retries: 2, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+        ]
+
+        // when
+        let strategy = RetryPolicyStrategy.chain(entries)
+
+        // then
+        if case .custom = strategy {
+            XCTAssertTrue(true)
+        } else {
+            XCTFail("Expected .custom strategy")
+        }
+    }
+
+    func test_thatRetrySequenceCreatesASequence_whenStrategyIsChain() {
+        // given
+        let sequence = RetrySequence(
+            strategy: .chain([
+                .init(retries: 3, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+                .init(retries: 2, strategy: ConstantDelayStrategy(duration: .nanosecond)),
+            ])
+        )
+
+        // when
+        let result: [UInt64] = sequence.map { $0 }
+
+        // then
+        XCTAssertEqual(result.count, 5)
+        XCTAssertEqual(result, [1, 1, 1, 1, 1])
+    }
+
     // MARK: Helpers
 
     private func toSeconds(_ nanos: UInt64) -> Double {

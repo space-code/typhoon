@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 
 ### Features
+- Add Swift Duration support for retry strategies
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#80](https://github.com/space-code/typhoon/pull/80).
 - Introduce chain delay strategy
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#79](https://github.com/space-code/typhoon/pull/79).
 - Introduce custom delay strategy

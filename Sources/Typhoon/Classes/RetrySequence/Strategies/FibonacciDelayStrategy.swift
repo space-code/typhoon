@@ -26,12 +26,8 @@ struct FibonacciDelayStrategy: IRetryDelayStrategy {
     /// - Parameter retries: The current retry attempt index (starting from `0`).
     /// - Returns: The delay in nanoseconds.
     func delay(forRetry retries: UInt) -> UInt64? {
-        guard let seconds = duration.double else { return .zero }
-
-        let fib = fibonacci(retries + 1)
-        let delay = seconds * Double(fib)
-
-        return (delay * .nanosec).safeUInt64
+        guard let nanos = duration.nanoseconds else { return .zero }
+        return nanos * fibonacci(retries + 1)
     }
 
     // MARK: - Private
@@ -39,7 +35,7 @@ struct FibonacciDelayStrategy: IRetryDelayStrategy {
     /// Returns the Fibonacci number for a given index.
     ///
     /// Uses an iterative approach to avoid recursion overhead.
-    private func fibonacci(_ n: UInt) -> UInt {
+    private func fibonacci(_ n: UInt) -> UInt64 {
         guard n > 1 else { return 1 }
 
         var previous: UInt = 1
@@ -51,6 +47,6 @@ struct FibonacciDelayStrategy: IRetryDelayStrategy {
             current = next
         }
 
-        return current
+        return UInt64(current)
     }
 }

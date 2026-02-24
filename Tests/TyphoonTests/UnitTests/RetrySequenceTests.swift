@@ -13,7 +13,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsConstant() {
         // given
-        let sequence = RetrySequence(strategy: .constant(retry: .retry, duration: .nanosecond))
+        let sequence = RetrySequence(strategy: .constant(retry: .retry, dispatchDuration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -24,7 +24,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsLinear() {
         // given
-        let sequence = RetrySequence(strategy: .linear(retry: .retry, duration: .nanosecond))
+        let sequence = RetrySequence(strategy: .linear(retry: .retry, dispatchDuration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -35,7 +35,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsFibonacci() {
         // given
-        let sequence = RetrySequence(strategy: .fibonacci(retry: .retry, duration: .nanosecond))
+        let sequence = RetrySequence(strategy: .fibonacci(retry: .retry, dispatchDuration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -57,7 +57,7 @@ final class RetrySequenceTests: XCTestCase {
 
     func test_thatRetrySequenceCreatesASequence_whenStrategyIsExponential() {
         // given
-        let sequence = RetrySequence(strategy: .exponential(retry: .retry, jitterFactor: .zero, duration: .nanosecond))
+        let sequence = RetrySequence(strategy: .exponential(retry: .retry, jitterFactor: .zero, dispatchDuration: .nanosecond))
 
         // when
         let result: [UInt64] = sequence.map { $0 }
@@ -78,7 +78,7 @@ final class RetrySequenceTests: XCTestCase {
                 jitterFactor: jitterFactor,
                 maxInterval: nil,
                 multiplier: multiplier,
-                duration: .seconds(Int(durationSeconds))
+                dispatchDuration: .seconds(Int(durationSeconds))
             )
         )
 
@@ -114,7 +114,7 @@ final class RetrySequenceTests: XCTestCase {
                 jitterFactor: 0.1,
                 maxInterval: maxIntervalDuration,
                 multiplier: 2.0,
-                duration: .seconds(1)
+                dispatchDuration: .seconds(1)
             )
         )
 
@@ -142,7 +142,7 @@ final class RetrySequenceTests: XCTestCase {
             jitterFactor: 0.5,
             maxInterval: nil,
             multiplier: 2.0,
-            duration: .milliseconds(10)
+            dispatchDuration: .milliseconds(10)
         )
 
         let sequence1 = RetrySequence(strategy: strategy)
@@ -180,7 +180,7 @@ final class RetrySequenceTests: XCTestCase {
                 jitterFactor: 0.1,
                 maxInterval: nil,
                 multiplier: 2.0,
-                duration: .seconds(1)
+                dispatchDuration: .seconds(1)
             )
         )
 
@@ -208,7 +208,7 @@ final class RetrySequenceTests: XCTestCase {
                 retry: .retry,
                 jitterFactor: .jitterFactor,
                 maxInterval: nil,
-                duration: .nanosecond
+                dispatchDuration: .nanosecond
             )
         )
 

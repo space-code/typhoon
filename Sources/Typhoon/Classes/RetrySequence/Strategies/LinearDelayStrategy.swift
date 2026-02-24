@@ -26,8 +26,7 @@ struct LinearDelayStrategy: IRetryDelayStrategy {
     /// The formula used:
     /// `baseDuration * (retries + 1)`
     func delay(forRetry retries: UInt) -> UInt64? {
-        guard let seconds = duration.double else { return .zero }
-        let delay = seconds * Double(retries + 1)
-        return (delay * .nanosec).safeUInt64
+        guard let nanos = duration.nanoseconds else { return .zero }
+        return nanos * UInt64(retries + 1)
     }
 }

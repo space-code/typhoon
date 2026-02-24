@@ -6,34 +6,32 @@
 import Foundation
 
 extension DispatchTimeInterval {
-    /// Converts a `DispatchTimeInterval` value into seconds represented as `Double`.
+    /// Converts a `DispatchTimeInterval` value into nanoseconds represented as `UInt64`.
     ///
-    /// This computed property normalizes all supported `DispatchTimeInterval` cases
-    /// (`seconds`, `milliseconds`, `microseconds`, `nanoseconds`) into a single
-    /// unit — **seconds** — which simplifies time calculations and conversions.
-    ///
-    /// For example:
-    /// - `.seconds(2)` → `2.0`
-    /// - `.milliseconds(500)` → `0.5`
-    /// - `.microseconds(1_000)` → `0.001`
-    /// - `.nanoseconds(1_000_000_000)` → `1.0`
-    ///
-    /// - Returns: The interval expressed in seconds as `Double`,
+    /// - Returns: The interval expressed in nanoseconds,
     ///   or `nil` if the interval represents `.never` or an unknown case.
-    var double: Double? {
+    var nanoseconds: UInt64? {
         switch self {
         case let .seconds(value):
-            return Double(value)
+            return UInt64(value) * 1_000_000_000
         case let .milliseconds(value):
-            return Double(value) * 1e-3
+            return UInt64(value) * 1_000_000
         case let .microseconds(value):
-            return Double(value) * 1e-6
+            return UInt64(value) * 1000
         case let .nanoseconds(value):
-            return Double(value) * 1e-9
+            return UInt64(value)
         case .never:
             return nil
         @unknown default:
             return nil
         }
+    }
+
+    @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+    static func from(_ duration: Duration) -> DispatchTimeInterval {
+        let seconds = duration.components.seconds
+        let nanos = duration.components.attoseconds / 1_000_000_000
+        let totalNanos = Int(seconds) * 1_000_000_000 + Int(nanos)
+        return .nanoseconds(totalNanos)
     }
 }

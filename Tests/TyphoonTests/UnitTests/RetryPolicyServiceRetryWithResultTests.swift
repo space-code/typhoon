@@ -29,7 +29,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     // MARK: Tests
 
     func test_retryWithResult_succeedsOnFirstAttempt() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 3, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 3, dispatchDuration: .milliseconds(10)))
 
         let result = try await sut.retryWithResult {
             42
@@ -42,7 +42,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_succeedsAfterSeveralFailures() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 5, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 5, dispatchDuration: .milliseconds(10)))
 
         let counter = Counter()
 
@@ -61,7 +61,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_throwsRetryLimitExceeded_whenAllAttemptsFail() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 3, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 3, dispatchDuration: .milliseconds(10)))
 
         do {
             _ = try await sut.retryWithResult {
@@ -72,7 +72,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_stopsRetrying_whenOnFailureReturnsFalse() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 5, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 5, dispatchDuration: .milliseconds(10)))
 
         let counter = Counter()
 
@@ -92,7 +92,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_stopsRetrying_onSpecificError() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 5, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 5, dispatchDuration: .milliseconds(10)))
 
         let counter = Counter()
 
@@ -115,7 +115,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_onFailureReceivesAllErrors() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 4, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 4, dispatchDuration: .milliseconds(10)))
 
         let counter = Counter()
         let receivedErrors = ErrorCollector()
@@ -140,8 +140,8 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_customStrategyOverridesDefault() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 10, duration: .milliseconds(10)))
-        let customStrategy = RetryPolicyStrategy.constant(retry: 2, duration: .milliseconds(10))
+        let sut = RetryPolicyService(strategy: .constant(retry: 10, dispatchDuration: .milliseconds(10)))
+        let customStrategy = RetryPolicyStrategy.constant(retry: 2, dispatchDuration: .milliseconds(10))
 
         let counter = Counter()
 
@@ -158,7 +158,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
     }
 
     func test_retryWithResult_totalDurationIsNonNegative() async throws {
-        let sut = RetryPolicyService(strategy: .constant(retry: 3, duration: .milliseconds(10)))
+        let sut = RetryPolicyService(strategy: .constant(retry: 3, dispatchDuration: .milliseconds(10)))
 
         let counter = Counter()
 

@@ -31,6 +31,20 @@ struct ExponentialDelayStrategy: IRetryDelayStrategy {
     /// If specified, the computed delay will never exceed this value.
     let maxInterval: DispatchTimeInterval?
 
+    // MARK: Initialization
+
+    init(
+        duration: DispatchTimeInterval,
+        multiplier: Double = 2.0,
+        jitterFactor: Double = 0.1,
+        maxInterval: DispatchTimeInterval? = .seconds(60)
+    ) {
+        self.duration = duration
+        self.multiplier = multiplier
+        self.jitterFactor = jitterFactor
+        self.maxInterval = maxInterval
+    }
+
     // MARK: - IRetryDelayStrategy
 
     /// Calculates the delay for a given retry attempt using
@@ -39,22 +53,21 @@ struct ExponentialDelayStrategy: IRetryDelayStrategy {
     /// - Parameter retries: The current retry attempt index (starting at `0`).
     /// - Returns: The delay in nanoseconds, or `nil` if it cannot be computed.
     func delay(forRetry retries: UInt) -> UInt64? {
-        guard let seconds = duration.double else { return .zero }
+        guard let baseNanos = duration.nanoseconds else { return .zero }
 
-        let maxDelayNanos = maxInterval.flatMap(\.double)
-            .map { min($0 * .nanosec, Double(UInt64.max)) } ?? Double(UInt64.max)
+        let maxDelayNanos = maxInterval?.nanoseconds.map { UInt64($0) } ?? UInt64.max
 
-        let base = seconds * .nanosec * pow(multiplier, Double(retries))
+        let base = Double(baseNanos) * pow(multiplier, Double(retries))
 
-        guard base < maxDelayNanos, base < Double(UInt64.max) else {
-            return maxDelayNanos.safeUInt64
+        guard base < Double(maxDelayNanos) else {
+            return maxDelayNanos
         }
 
         let jitterRange = base * jitterFactor
         let jittered = Double.random(
-            in: max(0, base - jitterRange) ... min(base + jitterRange, maxDelayNanos)
+            in: max(0, base - jitterRange) ... min(base + jitterRange, Double(maxDelayNanos))
         )
 
-        return min(jittered, maxDelayNanos).safeUInt64
+        return UInt64(jittered)
     }
 }

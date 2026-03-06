@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Documentation
+- Update `README.md`
+  - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#86](https://github.com/space-code/typhoon/pull/86).
 - Fix typos in the documentation
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 

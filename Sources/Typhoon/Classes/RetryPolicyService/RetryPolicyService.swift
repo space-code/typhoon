@@ -59,6 +59,9 @@ public final class RetryPolicyService {
     /// Optional maximum total duration allowed for all retry attempts.
     private let maxTotalDuration: DispatchTimeInterval?
 
+    /// An optional logger used to record retry attempts and related events.
+    private let logger: ILogger?
+
     // MARK: Initialization
 
     /// Initializes a new instance of `RetryPolicyService`.
@@ -66,11 +69,62 @@ public final class RetryPolicyService {
     /// - Parameters:
     ///   - strategy: The strategy that determines how retries are performed.
     ///   - maxTotalDuration: Optional maximum duration for all retries combined. If `nil`,
-    ///                       retries can continue indefinitely based on the
-    /// strategy.
-    public init(strategy: RetryPolicyStrategy, maxTotalDuration: DispatchTimeInterval? = nil) {
+    ///                       retries can continue indefinitely based on the strategy.
+    ///   -  logger: An optional logger for capturing retry-related information.
+    public init(
+        strategy: RetryPolicyStrategy,
+        maxTotalDuration: DispatchTimeInterval? = nil,
+        logger: ILogger? = nil
+    ) {
         self.strategy = strategy
         self.maxTotalDuration = maxTotalDuration
+        self.logger = logger
+    }
+
+    // MARK: Private
+
+    private func calculateDeadline() -> Date? {
+        maxTotalDuration?.nanoseconds.map {
+            Date().addingTimeInterval(TimeInterval($0) / 1_000_000_000)
+        }
+    }
+
+    private func checkDeadline(_ deadline: Date?, attempt: Int) throws {
+        if let deadline, Date() > deadline {
+            logger?.error("[RetryPolicy] Total duration exceeded after \(attempt) attempt(s).")
+            throw RetryPolicyError.totalDurationExceeded
+        }
+    }
+
+    private func handleRetryDecision(
+        error: Error,
+        onFailure: (@Sendable (Error) async -> Bool)?,
+        iterator: inout some IteratorProtocol<UInt64>,
+        attempt: Int
+    ) async throws {
+        if let onFailure, await !onFailure(error) {
+            logger?.warning("[RetryPolicy] Stopped retrying after \(attempt) attempt(s) — onFailure returned false.")
+            throw error
+        }
+
+        guard let duration = iterator.next() else {
+            logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
+            throw RetryPolicyError.retryLimitExceeded
+        }
+
+        logger?.info("[RetryPolicy] Waiting \(duration)ns before attempt \(attempt + 1)...")
+        try Task.checkCancellation()
+        try await Task.sleep(nanoseconds: duration)
+    }
+
+    private func logSuccess(attempt: Int) {
+        if attempt > 0 {
+            logger?.info("[RetryPolicy] Succeeded after \(attempt + 1) attempt(s).")
+        }
+    }
+
+    private func logFailure(attempt: Int, error: Error) {
+        logger?.warning("[RetryPolicy] Attempt \(attempt) failed: \(error.localizedDescription).")
     }
 }
 
@@ -91,34 +145,27 @@ extension RetryPolicyService: IRetryPolicyService {
         _ closure: @Sendable () async throws -> T
     ) async throws -> T {
         let effectiveStrategy = strategy ?? self.strategy
-
         var iterator = RetrySequence(strategy: effectiveStrategy).makeIterator()
-
-        let deadline = maxTotalDuration?.nanoseconds.map {
-            Date().addingTimeInterval(TimeInterval($0) / 1_000_000_000)
-        }
+        let deadline = calculateDeadline()
+        var attempt = 0
 
         while true {
-            if let deadline, Date() > deadline {
-                throw RetryPolicyError.totalDurationExceeded
-            }
+            try checkDeadline(deadline, attempt: attempt)
 
             do {
-                return try await closure()
+                let result = try await closure()
+                logSuccess(attempt: attempt)
+                return result
             } catch {
-                let shouldContinue = await onFailure?(error) ?? true
+                attempt += 1
+                logFailure(attempt: attempt, error: error)
 
-                if !shouldContinue {
-                    throw error
-                }
-
-                guard let duration = iterator.next() else {
-                    throw RetryPolicyError.retryLimitExceeded
-                }
-
-                try Task.checkCancellation()
-
-                try await Task.sleep(nanoseconds: duration)
+                try await handleRetryDecision(
+                    error: error,
+                    onFailure: onFailure,
+                    iterator: &iterator,
+                    attempt: attempt
+                )
             }
         }
     }

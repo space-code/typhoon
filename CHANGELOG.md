@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+#### 2.x Releases
+- `2.0.x` Releases - [2.0.0](#200)
+
 #### 1.x Releases
 - `1.4.x` Releases - [1.4.0](#140)
 - `1.3.x` Releases - [1.3.0](#130)
@@ -13,7 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `1.0.x` Releases - [1.0.0](#100)
 
 ---
-## [Unreleased]
+
+
+## [2.0.0](https://github.com/space-code/typhoon/releases/tag/2.0.0)
+
+Released on 2026-03-06. All issues associated with this milestone can be found using this [filter](https://github.com/space-code/typhoon/milestones?state=closed&q=2.0.0).
 
 ### Documentation
 - Update `README.md`
@@ -191,7 +198,7 @@ Released on 2023-11-12. All issues associated with this milestone can be found u
 - Release `1.0.0`
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#1](https://github.com/space-code/typhoon/pull/1).
 
-[unreleased]: https://github.com/space-code/typhoon/compare/1.4.0..HEAD
+[2.0.0]: https://github.com/space-code/typhoon/compare/1.4.0..2.0.0
 [1.4.0]: https://github.com/space-code/typhoon/compare/1.3.0..1.4.0
 [1.3.0]: https://github.com/space-code/typhoon/compare/1.2.1..1.3.0
 [1.2.1]: https://github.com/space-code/typhoon/compare/1.2.0..1.2.1

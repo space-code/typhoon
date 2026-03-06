@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#53](https://github.com/space-code/typhoon/pull/53).
 
 ### Features
+- Implement logging functionality
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#85](https://github.com/space-code/typhoon/pull/85).
 - Introduce URLSession extension
   - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#81](https://github.com/space-code/typhoon/pull/81).
 - Add Swift Duration support for retry strategies

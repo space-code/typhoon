@@ -17,7 +17,13 @@ final class RetryPolicyServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = RetryPolicyService(strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .seconds(0)))
+
+        sut = RetryPolicyService(
+            strategy: .constant(
+                retry: .defaultRetryCount,
+                dispatchDuration: .seconds(0)
+            )
+        )
     }
 
     override func tearDown() {
@@ -88,9 +94,9 @@ final class RetryPolicyServiceTests: XCTestCase {
         let result = try await sut.retry(
             strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1))
         ) {
-            let currentCount = await counter.increment()
+            let currentCount = counter.increment()
 
-            if currentCount >= .defaultRetryCount {
+            if UInt(currentCount) >= .defaultRetryCount {
                 return expectedValue
             }
             throw URLError(.unknown)
@@ -98,8 +104,8 @@ final class RetryPolicyServiceTests: XCTestCase {
 
         // then
         XCTAssertEqual(result, expectedValue)
-        let finalCount = await counter.getValue()
-        XCTAssertEqual(finalCount, .defaultRetryCount)
+        let finalCount = counter.getValue()
+        XCTAssertEqual(UInt(finalCount), .defaultRetryCount)
     }
 
     // MARK: Tests - Retry Count
@@ -113,13 +119,13 @@ final class RetryPolicyServiceTests: XCTestCase {
             _ = try await sut.retry(
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1))
             ) {
-                _ = await counter.increment()
+                counter.increment()
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        let attemptCount = await counter.getValue()
+        let attemptCount = counter.getValue()
         XCTAssertEqual(attemptCount, .defaultRetryCount + 1)
     }
 
@@ -133,13 +139,13 @@ final class RetryPolicyServiceTests: XCTestCase {
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in false }
             ) {
-                _ = await counter.increment()
+                counter.increment()
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        let attemptCount = await counter.getValue()
+        let attemptCount = counter.getValue()
         XCTAssertEqual(attemptCount, 1)
     }
 
@@ -181,13 +187,13 @@ final class RetryPolicyServiceTests: XCTestCase {
                     true
                 }
             ) {
-                _ = await counter.increment()
+                counter.increment()
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        let callCount = await counter.getValue()
+        let callCount = counter.getValue()
         XCTAssertEqual(callCount, expectedCallCount + 1)
     }
 
@@ -248,7 +254,7 @@ final class RetryPolicyServiceTests: XCTestCase {
                     return true
                 }
             ) {
-                let index = await counter.increment() - 1
+                let index = counter.increment() - 1
                 throw errors[min(Int(index), errors.count - 1)]
             }
         } catch {}
@@ -309,7 +315,7 @@ final class RetryPolicyServiceTests: XCTestCase {
 
         // when
         let result = try await service.retry {
-            let count = await counter.increment()
+            let count = counter.increment()
             if count >= 3 { return expectedValue }
             throw URLError(.unknown)
         }
@@ -351,13 +357,13 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await service.retry {
-                _ = await counter.increment()
+                counter.increment()
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        let attempts = await counter.getValue()
+        let attempts = counter.getValue()
         XCTAssertEqual(attempts, .defaultRetryCount + 1)
     }
 
@@ -377,33 +383,14 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         do {
             _ = try await service.retry {
-                _ = await counter.increment()
+                counter.increment()
                 throw URLError(.unknown)
             }
         } catch {}
 
         // then
-        let attempts = await counter.getValue()
+        let attempts = counter.getValue()
         XCTAssertEqual(attempts, 6)
-    }
-}
-
-// MARK: - Counter
-
-private actor Counter {
-    // MARK: Properties
-
-    private var value: UInt = 0
-
-    // MARK: Internal
-
-    func increment() -> UInt {
-        value += 1
-        return value
-    }
-
-    func getValue() -> UInt {
-        value
     }
 }
 

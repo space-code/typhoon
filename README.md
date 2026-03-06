@@ -21,7 +21,9 @@ Typhoon is a modern, lightweight Swift framework that provides elegant and robus
 🎯 **Type-Safe** - Leverages Swift's type system for compile-time safety  
 🔧 **Configurable** - Flexible retry parameters for any use case  
 📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS, and visionOS  
-⚡ **Lightweight** - Minimal footprint with zero dependencies  
+⚡ **Lightweight** - Minimal footprint with zero dependencies
+🧾 **Pluggable Logging** – Integrates with OSLog or custom loggers  
+🌐 **URLSession Integration** – Retry network requests with a single parameter  
 🧪 **Well Tested** - Comprehensive test coverage
 
 ## Table of Contents
@@ -34,6 +36,10 @@ Typhoon is a modern, lightweight Swift framework that provides elegant and robus
   - [Constant Strategy](#constant-strategy)
   - [Exponential Strategy](#exponential-strategy)
   - [Exponential with Jitter Strategy](#exponential-with-jitter-strategy)
+  - [Custom Strategy](#custom-strategy)
+  - [Chain Strategy](#chain-strategy)
+- [Logging](#logging)
+- [URLSession Integration](urlsession-integration)
 - [Common Use Cases](#common-use-cases)
 - [Communication](#communication)
 - [Documentation](#documentation)
@@ -95,7 +101,7 @@ do {
 
 ### Retry Strategies
 
-Typhoon provides three powerful retry strategies to handle different failure scenarios:
+Typhoon provides six powerful retry strategies to handle different failure scenarios:
 
 ```swift
 /// A retry strategy with a constant number of attempts and fixed duration between retries.
@@ -118,6 +124,15 @@ case exponential(
 
 /// A custom retry strategy defined by a user-provided delay calculator.
 case custom(retry: UInt, strategy: IRetryDelayStrategy)
+```
+
+Additionally, Typhoon allows composing multiple retry strategies into a single policy using a chained strategy:
+
+```
+RetryPolicyStrategy.chain([
+    .constant(retry: 2, dispatchDuration: .seconds(1)),
+    .exponential(retry: 3, dispatchDuration: .seconds(2))
+])
 ```
 
 ### Constant Strategy
@@ -315,6 +330,93 @@ The total retry count is calculated automatically from the sum of all entries �
 
 Each strategy in the chain uses **local indexing**, meaning every phase starts its delay calculation from zero. This ensures each strategy behaves predictably regardless of its position in the chain.
 
+## Logging
+
+Typhoon provides a lightweight logging abstraction that allows you to integrate retry diagnostics into your existing logging system.
+
+The framework defines a simple ILogger protocol:
+
+```
+public protocol ILogger: Sendable {
+    func info(_ message: String)
+    func warning(_ message: String)
+    func error(_ message: String)
+}
+```
+
+You can plug in any logging framework by implementing this protocol.
+
+### Using Apple's OSLog
+
+Typhoon includes built-in support for Apple's OSLog system via Logger:
+
+```
+import Typhoon
+import OSLog
+
+let logger = Logger(subsystem: "com.example.network", category: "retry")
+
+let retryService = RetryPolicyService(
+    strategy: .exponential(retry: 3, dispatchDuration: .seconds(1)),
+    logger: logger
+)
+```
+
+All retry attempts, failures, and final errors will be reported through the provided logger. 
+
+You can also integrate third-party loggers like SwiftLog or custom analytics systems.
+
+## URLSession Integration
+
+Typhoon provides built-in integration with URLSession, allowing you to apply retry policies directly to network requests with minimal boilerplate.
+
+Instead of wrapping network calls manually, you can call retry-enabled methods directly on URLSession.
+
+### Fetch Data with Retry
+
+```
+import Typhoon
+
+let (data, response) = try await URLSession.shared.data(
+    from: URL(string: "https://api.example.com/users")!,
+    retryPolicy: .exponential(
+        retry: 3,
+        jitterFactor: 0.1,
+        dispatchDuration: .seconds(1)
+    )
+)
+```
+
+### Using URLRequest
+
+```
+var request = URLRequest(url: URL(string: "https://api.example.com/users")!)
+request.httpMethod = "GET"
+
+let (data, response) = try await URLSession.shared.data(
+    for: request,
+    retryPolicy: .constant(retry: 3, dispatchDuration: .seconds(1))
+)
+```
+
+### Upload Requests
+
+```
+let (data, response) = try await URLSession.shared.upload(
+    for: request,
+    from: bodyData,
+    retryPolicy: .exponential(retry: 3, dispatchDuration: .seconds(1))
+)
+```
+
+### Download Requests
+
+```
+let (fileURL, response) = try await URLSession.shared.download(
+    for: request,
+    retryPolicy: .exponential(retry: 4, dispatchDuration: .seconds(2))
+)
+```
 
 ## Common Use Cases
 

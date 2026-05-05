@@ -58,7 +58,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
-                onFailure: { _ in false }
+                onFailure: { _ in .stop }
             ) {
                 throw originalError
             }
@@ -137,7 +137,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
-                onFailure: { _ in false }
+                onFailure: { _ in .stop }
             ) {
                 counter.increment()
                 throw URLError(.unknown)
@@ -162,7 +162,7 @@ final class RetryPolicyServiceTests: XCTestCase {
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
-                    return false
+                    return .stop
                 }
             ) {
                 throw expectedError
@@ -184,7 +184,7 @@ final class RetryPolicyServiceTests: XCTestCase {
             _ = try await sut.retry(
                 strategy: .constant(retry: expectedCallCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in
-                    true
+                    .retry
                 }
             ) {
                 counter.increment()
@@ -251,7 +251,7 @@ final class RetryPolicyServiceTests: XCTestCase {
                 strategy: .constant(retry: UInt(errors.count), dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
-                    return true
+                    return .retry
                 }
             ) {
                 let index = counter.increment() - 1
@@ -365,6 +365,34 @@ final class RetryPolicyServiceTests: XCTestCase {
         // then
         let attempts = counter.getValue()
         XCTAssertEqual(attempts, .defaultRetryCount + 1)
+    }
+
+    func test_thatRetrySkipsDelay_whenOnFailureReturnsSkipDelay() async throws {
+        // given
+        let counter = Counter()
+        let strategy = RetryPolicyStrategy.constant(retry: 1, dispatchDuration: .seconds(10)) // 10s delay
+        let service = RetryPolicyService(strategy: strategy)
+        let startTime = Date()
+
+        // when
+        do {
+            _ = try await service.retry(
+                strategy: nil,
+                onFailure: { _ in .skipDelay }
+            ) {
+                if counter.increment() == 1 {
+                    throw URLError(.unknown)
+                }
+                return 42
+            }
+        } catch {
+            XCTFail("Should not throw error")
+        }
+
+        // then
+        let duration = Date().timeIntervalSince(startTime)
+        XCTAssertLessThan(duration, 1.0, "Retry should have skipped the 10s delay")
+        XCTAssertEqual(counter.getValue(), 2)
     }
 
     func test_thatChainDelayStrategy_worksWithRetryPolicyService() async throws {

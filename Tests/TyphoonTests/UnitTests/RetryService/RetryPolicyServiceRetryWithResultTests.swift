@@ -78,7 +78,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
         // when
         do {
             _ = try await sut.retryWithResult(
-                onFailure: { _ in false }
+                onFailure: { _ in .stop }
             ) {
                 counter.increment()
                 throw TestError.fatal
@@ -101,7 +101,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
         do {
             _ = try await sut.retryWithResult(
                 onFailure: { error in
-                    (error as? TestError) == .transient
+                    (error as? TestError) == .transient ? .retry : .stop
                 }
             ) {
                 counter.increment()
@@ -127,7 +127,7 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
         let result = try await sut.retryWithResult(
             onFailure: { error in
                 await receivedErrors.append(error)
-                return true
+                return .retry
             }
         ) {
             counter.increment()

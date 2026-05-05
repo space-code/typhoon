@@ -85,13 +85,13 @@ final class RetryPolicyServiceLoggerTests: XCTestCase {
         // when
         _ = try? await sut.retry(
             strategy: nil,
-            onFailure: { _ in false }
+            onFailure: { _ in .stop }
         ) {
             throw URLError(.badServerResponse)
         }
 
         // then
-        XCTAssertTrue(logger.warningMessages.contains { $0.contains("onFailure returned false") })
+        XCTAssertTrue(logger.warningMessages.contains { $0.contains("onFailure returned stop") })
     }
 
     func test_logsError_onTotalDurationExceeded() async {

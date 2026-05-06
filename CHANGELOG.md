@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [Unreleased]
 
+### Features
+- Add ability to skip retry delay
+  - Implemented by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#103](https://github.com/space-code/typhoon/pull/103).
+
 ### Miscellaneous Tasks
 - Update ci
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#101](https://github.com/space-code/typhoon/pull/101).

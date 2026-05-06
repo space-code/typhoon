@@ -100,7 +100,8 @@ public final class RetryPolicyService {
         error: Error,
         onFailure: (@Sendable (Error) async -> RetryAction)?,
         iterator: inout some IteratorProtocol<UInt64>,
-        attempt: Int
+        attempt: Int,
+        collectedErrors: [Error]
     ) async throws {
         let action = await onFailure?(error) ?? .retry
 
@@ -108,7 +109,7 @@ public final class RetryPolicyService {
         case .retry:
             guard let duration = iterator.next() else {
                 logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
-                throw RetryPolicyError.retryLimitExceeded
+                throw RetryPolicyError.retryLimitExceeded(errors: collectedErrors)
             }
 
             logger?.info("[RetryPolicy] Waiting \(duration)ns before attempt \(attempt + 1)...")
@@ -117,7 +118,7 @@ public final class RetryPolicyService {
         case .skipDelay:
             guard iterator.next() != nil else {
                 logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
-                throw RetryPolicyError.retryLimitExceeded
+                throw RetryPolicyError.retryLimitExceeded(errors: collectedErrors)
             }
 
             logger?.info("[RetryPolicy] Retrying attempt \(attempt + 1) immediately (delay skipped).")
@@ -159,6 +160,7 @@ extension RetryPolicyService: IRetryPolicyService {
         var iterator = RetrySequence(strategy: effectiveStrategy).makeIterator()
         let deadline = calculateDeadline()
         var attempt = 0
+        var collectedErrors: [Error] = []
 
         while true {
             try checkDeadline(deadline, attempt: attempt)
@@ -169,13 +171,15 @@ extension RetryPolicyService: IRetryPolicyService {
                 return result
             } catch {
                 attempt += 1
+                collectedErrors.append(error)
                 logFailure(attempt: attempt, error: error)
 
                 try await handleRetryDecision(
                     error: error,
                     onFailure: onFailure,
                     iterator: &iterator,
-                    attempt: attempt
+                    attempt: attempt,
+                    collectedErrors: collectedErrors
                 )
             }
         }

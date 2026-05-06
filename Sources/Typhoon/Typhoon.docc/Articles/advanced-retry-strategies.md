@@ -153,10 +153,10 @@ func fetchWithConditionalRetry() async throws -> Data {
                 switch error {
                 case .serverError, .timeout, .connectionLost:
                     // These errors were already retried
-                    return true
+                    return .retry
                 case .clientError:
                     // Don't retry client errors (4xx)
-                    return false
+                    return .stop
                 }
             }
 

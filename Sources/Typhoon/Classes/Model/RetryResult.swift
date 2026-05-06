@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - RetryResult
+
 /// Represents the result of executing a closure with a retry policy.
 public struct RetryResult<T> {
     /// The successfully returned value from the closure.
@@ -19,3 +21,7 @@ public struct RetryResult<T> {
     /// List of errors encountered during each failed attempt.
     public let errors: [Error]
 }
+
+// MARK: Sendable
+
+extension RetryResult: Sendable where T: Sendable {}

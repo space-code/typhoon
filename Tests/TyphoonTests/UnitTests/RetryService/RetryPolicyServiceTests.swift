@@ -34,9 +34,6 @@ final class RetryPolicyServiceTests: XCTestCase {
     // MARK: Tests - Error Handling
 
     func test_thatRetryThrowsRetryLimitExceededError_whenAllRetriesFail() async throws {
-        // given
-        let expectedError = RetryPolicyError.retryLimitExceeded
-
         // when
         var receivedError: Error?
         do {
@@ -46,7 +43,12 @@ final class RetryPolicyServiceTests: XCTestCase {
         }
 
         // then
-        XCTAssertEqual(receivedError as? NSError, expectedError as NSError)
+        guard case let .retryLimitExceeded(errors) = receivedError as? RetryPolicyError else {
+            XCTFail("Expected retryLimitExceeded, got \(String(describing: receivedError))")
+            return
+        }
+        XCTAssertFalse(errors.isEmpty, "Collected errors should not be empty")
+        XCTAssertTrue(errors.allSatisfy { ($0 as? URLError)?.code == .unknown })
     }
 
     func test_thatRetryThrowsOriginalError_whenOnFailureReturnsFalse() async throws {
@@ -58,7 +60,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
-                onFailure: { _ in false }
+                onFailure: { _ in .stop }
             ) {
                 throw originalError
             }
@@ -137,7 +139,7 @@ final class RetryPolicyServiceTests: XCTestCase {
         do {
             _ = try await sut.retry(
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
-                onFailure: { _ in false }
+                onFailure: { _ in .stop }
             ) {
                 counter.increment()
                 throw URLError(.unknown)
@@ -162,7 +164,7 @@ final class RetryPolicyServiceTests: XCTestCase {
                 strategy: .constant(retry: .defaultRetryCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
-                    return false
+                    return .stop
                 }
             ) {
                 throw expectedError
@@ -184,7 +186,7 @@ final class RetryPolicyServiceTests: XCTestCase {
             _ = try await sut.retry(
                 strategy: .constant(retry: expectedCallCount, dispatchDuration: .nanoseconds(1)),
                 onFailure: { _ in
-                    true
+                    .retry
                 }
             ) {
                 counter.increment()
@@ -251,7 +253,7 @@ final class RetryPolicyServiceTests: XCTestCase {
                 strategy: .constant(retry: UInt(errors.count), dispatchDuration: .nanoseconds(1)),
                 onFailure: { error in
                     await errorContainer.setError(error as NSError)
-                    return true
+                    return .retry
                 }
             ) {
                 let index = counter.increment() - 1
@@ -343,7 +345,10 @@ final class RetryPolicyServiceTests: XCTestCase {
 
         // then
         XCTAssertEqual(receivedError as? RetryPolicyError, .totalDurationExceeded)
-        XCTAssertNotEqual(receivedError as? RetryPolicyError, .retryLimitExceeded)
+
+        if case .retryLimitExceeded = receivedError as? RetryPolicyError {
+            XCTFail("Expected totalDurationExceeded, not retryLimitExceeded")
+        }
     }
 
     func test_thatRetryIgnoresDeadline_whenMaxTotalDurationIsNil() async throws {
@@ -365,6 +370,34 @@ final class RetryPolicyServiceTests: XCTestCase {
         // then
         let attempts = counter.getValue()
         XCTAssertEqual(attempts, .defaultRetryCount + 1)
+    }
+
+    func test_thatRetrySkipsDelay_whenOnFailureReturnsSkipDelay() async throws {
+        // given
+        let counter = Counter()
+        let strategy = RetryPolicyStrategy.constant(retry: 1, dispatchDuration: .seconds(10)) // 10s delay
+        let service = RetryPolicyService(strategy: strategy)
+        let startTime = Date()
+
+        // when
+        do {
+            _ = try await service.retry(
+                strategy: nil,
+                onFailure: { _ in .skipDelay }
+            ) {
+                if counter.increment() == 1 {
+                    throw URLError(.unknown)
+                }
+                return 42
+            }
+        } catch {
+            XCTFail("Should not throw error")
+        }
+
+        // then
+        let duration = Date().timeIntervalSince(startTime)
+        XCTAssertLessThan(duration, 1.0, "Retry should have skipped the 10s delay")
+        XCTAssertEqual(counter.getValue(), 2)
     }
 
     func test_thatChainDelayStrategy_worksWithRetryPolicyService() async throws {
@@ -391,6 +424,45 @@ final class RetryPolicyServiceTests: XCTestCase {
         // then
         let attempts = counter.getValue()
         XCTAssertEqual(attempts, 6)
+    }
+
+    func test_thatRetryLimitExceededContainsAllCollectedErrors_whenAllRetriesFail() async throws {
+        // given
+        let retryCount: UInt = 3
+        let errors: [URLError] = [
+            URLError(.badURL),
+            URLError(.timedOut),
+            URLError(.cannotFindHost),
+            URLError(.unknown),
+        ]
+        let counter = Counter()
+        let service = RetryPolicyService(
+            strategy: .constant(retry: retryCount, dispatchDuration: .nanoseconds(1))
+        )
+
+        // when
+        var receivedError: Error?
+        do {
+            _ = try await service.retry {
+                let index = Int(counter.increment()) - 1
+                throw errors[min(index, errors.count - 1)]
+            }
+        } catch {
+            receivedError = error
+        }
+
+        // then
+        guard case let .retryLimitExceeded(collectedErrors) = receivedError as? RetryPolicyError else {
+            XCTFail("Expected retryLimitExceeded, got \(String(describing: receivedError))")
+            return
+        }
+
+        XCTAssertEqual(collectedErrors.count, Int(retryCount) + 1)
+        XCTAssertTrue(
+            collectedErrors.enumerated().allSatisfy {
+                ($0.element as? URLError)?.code == errors[min($0.offset, errors.count - 1)].code
+            }
+        )
     }
 }
 

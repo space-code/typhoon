@@ -19,7 +19,7 @@ public protocol IRetryPolicyService: Sendable {
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: (@Sendable (Error) async -> Bool)?,
+        onFailure: (@Sendable (Error) async -> RetryAction)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> T
 
@@ -27,13 +27,13 @@ public protocol IRetryPolicyService: Sendable {
     ///
     /// - Parameters:
     ///   - strategy: Optional strategy that defines the retry behavior.
-    ///   - onFailure: Optional closure called on each failure; returning `true` stops retries.
+    ///   - onFailure: Optional closure called on each failure; returning `.stop` stops retries.
     ///   - closure: The async closure to be retried according to the strategy.
     ///
     /// - Returns: A `RetryResult` containing the final value, attempt count, total duration, and encountered errors.
     func retryWithResult<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: (@Sendable (Error) async -> Bool)?,
+        onFailure: (@Sendable (Error) async -> RetryAction)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> RetryResult<T>
 }
@@ -67,7 +67,10 @@ public extension IRetryPolicyService {
     ///   - closure: The closure that will be retried based on the specified strategy.
     ///
     /// - Returns: The result of the closure's execution after retrying based on the policy.
-    func retry<T>(_ closure: @Sendable () async throws -> T, onFailure: (@Sendable (Error) async -> Bool)?) async throws -> T {
+    func retry<T>(
+        _ closure: @Sendable () async throws -> T,
+        onFailure: (@Sendable (Error) async -> RetryAction)?
+    ) async throws -> T {
         try await retry(strategy: nil, onFailure: onFailure, closure)
     }
 
@@ -91,7 +94,7 @@ public extension IRetryPolicyService {
     ///
     /// - Returns: A `RetryResult` containing the final value, attempt count, total duration, and encountered errors.
     func retryWithResult<T>(
-        onFailure: (@Sendable (Error) async -> Bool)?,
+        onFailure: (@Sendable (Error) async -> RetryAction)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> RetryResult<T> {
         try await retryWithResult(strategy: nil, onFailure: onFailure, closure)

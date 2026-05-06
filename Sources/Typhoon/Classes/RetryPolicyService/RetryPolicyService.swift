@@ -32,9 +32,9 @@ import Foundation
 ///     onFailure: { error in
 ///         print("Request failed with error: \(error)")
 ///
-///         // Return `true` to continue retrying,
-///         // or `false` to stop and rethrow the error.
-///         return true
+///         // Return `.retry` to continue retrying,
+///         // or `.stop` to stop and rethrow the error.
+///         return .retry
 ///     }
 /// ) {
 ///     try await apiClient.fetchData()
@@ -98,23 +98,35 @@ public final class RetryPolicyService {
 
     private func handleRetryDecision(
         error: Error,
-        onFailure: (@Sendable (Error) async -> Bool)?,
+        onFailure: (@Sendable (Error) async -> RetryAction)?,
         iterator: inout some IteratorProtocol<UInt64>,
-        attempt: Int
+        attempt: Int,
+        collectedErrors: [Error]
     ) async throws {
-        if let onFailure, await !onFailure(error) {
-            logger?.warning("[RetryPolicy] Stopped retrying after \(attempt) attempt(s) — onFailure returned false.")
+        let action = await onFailure?(error) ?? .retry
+
+        switch action {
+        case .retry:
+            guard let duration = iterator.next() else {
+                logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
+                throw RetryPolicyError.retryLimitExceeded(errors: collectedErrors)
+            }
+
+            logger?.info("[RetryPolicy] Waiting \(duration)ns before attempt \(attempt + 1)...")
+            try Task.checkCancellation()
+            try await Task.sleep(nanoseconds: duration)
+        case .skipDelay:
+            guard iterator.next() != nil else {
+                logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
+                throw RetryPolicyError.retryLimitExceeded(errors: collectedErrors)
+            }
+
+            logger?.info("[RetryPolicy] Retrying attempt \(attempt + 1) immediately (delay skipped).")
+            try Task.checkCancellation()
+        case .stop:
+            logger?.warning("[RetryPolicy] Stopped retrying after \(attempt) attempt(s) — onFailure returned stop.")
             throw error
         }
-
-        guard let duration = iterator.next() else {
-            logger?.error("[RetryPolicy] Retry limit exceeded after \(attempt) attempt(s).")
-            throw RetryPolicyError.retryLimitExceeded
-        }
-
-        logger?.info("[RetryPolicy] Waiting \(duration)ns before attempt \(attempt + 1)...")
-        try Task.checkCancellation()
-        try await Task.sleep(nanoseconds: duration)
     }
 
     private func logSuccess(attempt: Int) {
@@ -141,13 +153,14 @@ extension RetryPolicyService: IRetryPolicyService {
     /// - Returns: The result of the closure's execution after retrying based on the policy.
     public func retry<T>(
         strategy: RetryPolicyStrategy?,
-        onFailure: (@Sendable (Error) async -> Bool)?,
+        onFailure: (@Sendable (Error) async -> RetryAction)?,
         _ closure: @Sendable () async throws -> T
     ) async throws -> T {
         let effectiveStrategy = strategy ?? self.strategy
         var iterator = RetrySequence(strategy: effectiveStrategy).makeIterator()
         let deadline = calculateDeadline()
         var attempt = 0
+        var collectedErrors: [Error] = []
 
         while true {
             try checkDeadline(deadline, attempt: attempt)
@@ -158,13 +171,15 @@ extension RetryPolicyService: IRetryPolicyService {
                 return result
             } catch {
                 attempt += 1
+                collectedErrors.append(error)
                 logFailure(attempt: attempt, error: error)
 
                 try await handleRetryDecision(
                     error: error,
                     onFailure: onFailure,
                     iterator: &iterator,
-                    attempt: attempt
+                    attempt: attempt,
+                    collectedErrors: collectedErrors
                 )
             }
         }
@@ -180,7 +195,7 @@ extension RetryPolicyService: IRetryPolicyService {
     /// - Returns: A `RetryResult` containing the final value, attempt count, total duration, and encountered errors.
     public func retryWithResult<T>(
         strategy: RetryPolicyStrategy? = nil,
-        onFailure: (@Sendable (Error) async -> Bool)? = nil,
+        onFailure: (@Sendable (Error) async -> RetryAction)? = nil,
         _ closure: @Sendable () async throws -> T
     ) async throws -> RetryResult<T> {
         let state = State()
@@ -190,7 +205,7 @@ extension RetryPolicyService: IRetryPolicyService {
             strategy: strategy,
             onFailure: { error in
                 await state.recordError(error)
-                return await onFailure?(error) ?? true
+                return await onFailure?(error) ?? .retry
             }, {
                 await state.recordAttempt()
                 return try await closure()

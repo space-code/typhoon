@@ -105,7 +105,7 @@
                 _ = try await sut.data(
                     for: .stub,
                     retryPolicy: .constant(retry: 5, dispatchDuration: .milliseconds(1)),
-                    onFailure: { _ in false }
+                    onFailure: { _ in .stop }
                 )
                 XCTFail("Expected URLError to be thrown")
             } catch is URLError {
@@ -130,7 +130,7 @@
                     retryPolicy: .constant(retry: 3, dispatchDuration: .milliseconds(1)),
                     onFailure: { _ in
                         counter.increment()
-                        return true
+                        return .retry
                     }
                 )
                 XCTFail("Expected RetryPolicyError.retryLimitExceeded to be thrown")

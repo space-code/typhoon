@@ -27,7 +27,7 @@ public protocol IRetryPolicyService: Sendable {
     ///
     /// - Parameters:
     ///   - strategy: Optional strategy that defines the retry behavior.
-    ///   - onFailure: Optional closure called on each failure; returning `true` stops retries.
+    ///   - onFailure: Optional closure called on each failure; returning `.stop` stops retries.
     ///   - closure: The async closure to be retried according to the strategy.
     ///
     /// - Returns: A `RetryResult` containing the final value, attempt count, total duration, and encountered errors.

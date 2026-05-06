@@ -32,9 +32,9 @@ import Foundation
 ///     onFailure: { error in
 ///         print("Request failed with error: \(error)")
 ///
-///         // Return `true` to continue retrying,
-///         // or `false` to stop and rethrow the error.
-///         return true
+///         // Return `.retry` to continue retrying,
+///         // or `.stop` to stop and rethrow the error.
+///         return .retry
 ///     }
 /// ) {
 ///     try await apiClient.fetchData()

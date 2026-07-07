@@ -318,7 +318,9 @@ final class RetryPolicyServiceTests: XCTestCase {
         // when
         let result = try await service.retry {
             let count = counter.increment()
-            if count >= 3 { return expectedValue }
+            if count >= 3 {
+                return expectedValue
+            }
             throw URLError(.unknown)
         }
 

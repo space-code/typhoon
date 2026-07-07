@@ -58,7 +58,9 @@
 
             await setHandler {
                 let count = counter.increment()
-                if count < 2 { throw URLError(.notConnectedToInternet) }
+                if count < 2 {
+                    throw URLError(.notConnectedToInternet)
+                }
                 return (.ok, Data(String.data.utf8))
             }
 
@@ -149,7 +151,9 @@
 
             await setHandler {
                 let count = counter.increment()
-                if count < 3 { throw URLError(.timedOut) }
+                if count < 3 {
+                    throw URLError(.timedOut)
+                }
                 return (.ok, Data(String.data.utf8))
             }
 
@@ -173,7 +177,9 @@
 
                 await setHandler {
                     let count = counter.increment()
-                    if count < 2 { throw URLError(.networkConnectionLost) }
+                    if count < 2 {
+                        throw URLError(.networkConnectionLost)
+                    }
                     return (.ok, Data())
                 }
 
@@ -196,7 +202,9 @@
 
             await setHandler {
                 let count = counter.increment()
-                if count < 2 { throw URLError(.timedOut) }
+                if count < 2 {
+                    throw URLError(.timedOut)
+                }
                 return (.ok, Data(String.data.utf8))
             }
 

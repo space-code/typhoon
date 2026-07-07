@@ -173,7 +173,9 @@ final class RetryPolicyServiceRetryWithResultTests: XCTestCase {
         // when
         let result = try await sut.retryWithResult {
             counter.increment()
-            if counter.value < 2 { throw TestError.transient }
+            if counter.value < 2 {
+                throw TestError.transient
+            }
             return true
         }
 

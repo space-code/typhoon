@@ -43,7 +43,9 @@ final class RetryPolicyServiceLoggerTests: XCTestCase {
         // when
         _ = try? await sut.retry(strategy: nil, onFailure: nil) {
             attempt.increment()
-            if attempt.value < 3 { throw URLError(.notConnectedToInternet) }
+            if attempt.value < 3 {
+                throw URLError(.notConnectedToInternet)
+            }
             return 42
         }
 
@@ -58,7 +60,9 @@ final class RetryPolicyServiceLoggerTests: XCTestCase {
 
         _ = try await sut.retry(strategy: nil, onFailure: nil) {
             attempt.increment()
-            if attempt.value < 2 { throw URLError(.notConnectedToInternet) }
+            if attempt.value < 2 {
+                throw URLError(.notConnectedToInternet)
+            }
             return 42
         }
 

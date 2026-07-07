@@ -55,7 +55,7 @@ jobs:
           - { platform: watchOS, name: "watchOS 10.4", xcode: "Xcode_15.3", runsOn: macOS-14, destination: "OS=10.4,name=Apple Watch Series 9 (45mm)" }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run tests - ${{ matrix.name }}
         run: |
           xcodebuild test \
@@ -87,7 +87,7 @@ jobs:
           - { name: "macOS 14, SPM 5.10.0", xcode: "Xcode_15.3", runsOn: macOS-14 }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build with Swift Package Manager - ${{ matrix.name }}
         run: swift build -c release
 
@@ -115,7 +115,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: ${{ matrix.image }}
         run: swift build --build-tests -c debug
 
@@ -127,7 +127,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build for Android
         uses: skiptools/swift-android-action@v2
         with:

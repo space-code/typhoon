@@ -19,7 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `1.0.x` Releases - [1.0.0](#100)
 
 ---
+## [Unreleased]
 
+### Miscellaneous Tasks
+- Update simulator version in CI
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#122](https://github.com/space-code/typhoon/pull/122).
 
 ## [3.0.0](https://github.com/space-code/typhoon/releases/tag/3.0.0)
 
@@ -213,6 +217,7 @@ Released on 2023-11-12. All issues associated with this milestone can be found u
 - Release `1.0.0`
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#1](https://github.com/space-code/typhoon/pull/1).
 
+[unreleased]: https://github.com/space-code/typhoon/compare/3.0.0..HEAD
 [3.0.0]: https://github.com/space-code/typhoon/compare/2.0.0..3.0.0
 [2.0.0]: https://github.com/space-code/typhoon/compare/1.4.0..2.0.0
 [1.4.0]: https://github.com/space-code/typhoon/compare/1.3.0..1.4.0

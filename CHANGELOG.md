@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update simulator version in CI
   - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#122](https://github.com/space-code/typhoon/pull/122).
 
+### Styling
+- Apply SwiftFormat across the project
+  - Contributed by [@ns-vasilev](https://github.com/ns-vasilev) in Pull Request [#123](https://github.com/space-code/typhoon/pull/123).
+
 ## [3.0.0](https://github.com/space-code/typhoon/releases/tag/3.0.0)
 
 Released on 2026-05-06. All issues associated with this milestone can be found using this [filter](https://github.com/space-code/typhoon/milestones?state=closed&q=3.0.0).
